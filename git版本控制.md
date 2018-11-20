@@ -43,7 +43,16 @@
 			- > git log --pretty=oneline  可以保证每条记录在同一行显示
 			- > git --oneline  相对更加简洁
 			- > git reflog  其中的 HEAD@{移动到当前版本需要多少步}
-			- 基于索引值进行版本穿梭操作 > git reset --hard <索引值>
+			
+		* 基于索引值进行版本穿梭操作 > git reset --hard <索引值>
+			- > git reset --hard HEAD^^ HEAD后面跟几个^符号表示后退几个版本  只能后退
+			- > git reset --hard HEAD~3 ~符号后面跟上数字几就表示后退几个版本 只能后退J
 		* 多屏显示  空格向下翻页  B向上分页 Q退出
+		* 使用 > rm <file> 可以删除文件，然后相继使用 > git add  > git commit 可以将文件删除的操作提交到本地库
+
+5 添加到暂存区(尚未提交到本地库)的删除文件找回
+
+		* 使用 > git reset --hard HEAD （因为删除操作尚未提交到本地库，而 --hard 关键字表示的是 在本地库移动指针，会对工作区和暂存区都进行刷新）
+		* 删除的文件能找回的前提是，文件存在时的状态提交到了本地库。
  
 
