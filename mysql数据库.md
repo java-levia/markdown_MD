@@ -110,4 +110,11 @@
 
 			- select max(emp_no) into maxempno from employees;  //这条语句获取employees表中emp_no字段的最大值并赋值给maxempno;
 
+		* repeat语句（另一种循环语句）
+			- 语句格式为
+				-> repeat
+				-> STATEMENT
+				-> until 条件   //退出循环的条件
+				-> end repeat;
+
 		
