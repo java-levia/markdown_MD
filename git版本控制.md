@@ -87,5 +87,18 @@
 			-   hhhhhhhhhh  edit by <另一个分支名>
 			-   >>>>>>>>>>  <另一个分支名>
 			
- 
 
+8 Eclipse集成Git
+	
+	忽略的文件
+		- Eclipse中有部分文件是编辑器自动生成的，是用来管理我们写的代码，不需要提交到本地库,包括：
+			- .classpath
+			- .settings
+			- .project
+			- target文件夹下的所有
+
+	设置忽略文件
+			- https://github.com/github/gitignore
+			- 在用户文件夹下创建java.gitignore文件，复制github提供的java.gitignore文件并添加eclipse中需要忽略的文件到java.gitignore中。
+			- 在用户文件夹下的.gitconfig文件中[core]下添加excludesfile = c:/Users/mi/java.gitignore 
+	
