@@ -97,3 +97,27 @@ default-character-set=utf8
 
 [mysqld]
 character-set-server=utf8
+
+
+设置ubuntu 14.04命令行启动
+	在ubuntu Server 14.04.1 测试成功  原本没界面 手贱装了个图形界面
+
+修改 /etc/X11/default-display-manager   将里面的一行路径前面加#号注释掉(内容一般就只有一行/usr/bin/kdm ) 然后换新的一行输入 false  保存
+
+
+修改/etc/default/grub
+将GRUB_CMDLINE_LINUX_DEFAULT=”quiet splash”改为：GRUB_CMDLINE_LINUX_DEFAULT=” text”
+然后执行命令
+sudo update-grub2
+sudo update-grub
+
+Ctrl+Alt+F1 使用命令行界面 停掉GDM服务:sudo update-rc.d -f gdm remove重新启动sudo reboot -n
+
+我也不知道为啥 网上找了好多版本设置都不一样 文件名称位置也不一样，没办法用。
+
+
+--------------------- 
+作者：凌一木 
+来源：CSDN 
+原文：https://blog.csdn.net/ld362093642/article/details/78130753 
+版权声明：本文为博主原创文章，转载请附上博文链接！
