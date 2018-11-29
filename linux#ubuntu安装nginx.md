@@ -5,63 +5,61 @@
 sudo apt-get update
 sudo apt-get upgrade
 
-    1 sudo apt-get update
-    2 sudo apt-get upgrade
+    # sudo apt-get update
+    # sudo apt-get upgrade
 
 2.安装nginx需要的依赖包
 
-sudo apt-get install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev
-
-    1 sudo apt-get install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev
+    # sudo apt-get install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev
 
 3.下载nginx
 
-	1 cd /home
+	# cd /home
 
-	2 wget http://nginx.org/download/nginx-1.10.2.tar.gz
+	# wget http://nginx.org/download/nginx-1.10.2.tar.gz
 
 4.解压nginx
 
-    1 tar -zxvf nginx-1.10.2.tar.gz
+    # tar -zxvf nginx-1.10.2.tar.gz
 
 5.编译，安装nginx
 
-    cd nginx-1.10.2.tar.gz
+	# cd nginx-1.10.2.tar.gz
 
-    ./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module
+	# ./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module
 
-	make
+	# make
 
-	make install
+	# make install
 
 
 6.查看nginx版本
 
-	/usr/local/nginx/sbin/nginx -v
+	# /usr/local/nginx/sbin/nginx -v
 
 
 7.启动nginx
 
-	/usr/local/nginx/sbin/nginx
+	# /usr/local/nginx/sbin/nginx
 
 
 注意：此步，有可能nginx默认的80端口被apache2服务占用，导致无法启动nginx。可以修改nginx的服务端口或者apache2的服务端口。
 
 8.修改apache2端口
 
-	vi /etc/apache2/ports.conf
+	# vi /etc/apache2/ports.conf
 
 
 apache ports
 修改第5行 为Listen 88
 重启apache2服务
 
-	service apache2 restart
+	# service apache2 restart
 
 
 再次启动nginx
 
-	/usr/local/nginx/sbin/nginx
+	# /usr/local/nginx/sbin/nginx
 
 
 9 springBoot项目使用nginx服务器配置ssl证书
