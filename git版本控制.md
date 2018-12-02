@@ -41,7 +41,7 @@
 			- 在每条版本历史纪录中 commit后面的一行四十位的字符串是这个版本的哈希值（可看作版本号）
 			- 有一条纪录上会有（HEAD->master）指示，这是表示git的版本指针，指示当前的版本。
 			- > git log --pretty=oneline  可以保证每条记录在同一行显示
-			- > git --oneline  相对更加简洁
+			- > git log --oneline  相对更加简洁
 			- > git reflog  其中的 HEAD@{移动到当前版本需要多少步}
 			
 		* 基于索引值进行版本穿梭操作 > git reset --hard <索引值>
