@@ -1,9 +1,6 @@
-#mysql数据库高级#
+#mysql数据库###
 
-1 sql性能下降排查
-	
-
-
+1. sql性能下降排查
 
 
 		* 索引失效的情况
@@ -16,3 +13,8 @@
 				    大家可以注意：
 				    handler_read_key:这个值越高越好，越高表示使用索引查询到的次数
 				    handler_read_rnd_next:这个值越高，说明查询低效
+
+2. 函数
+   1. TO_DAYS(日期)会返回一个从年份0开始的天数（可以在数据库中操作两个日期之间的天数）
+   2. INTERVAL 1 DAY / INTERVAL 1 HOUR 等 ，就是取间隔的含义比如  NOW() - INTERVAL  1 DAY的含义就是一天之前的这个时间点。
+   3. DATE_FORMAT(日期，格式)；
