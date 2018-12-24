@@ -30,7 +30,7 @@
 	9. move key db-index 将key从当前数据库移动到制定的数据库
 	10. flushdb 删除当前数据库中的所有key
 	11. flushall 删除所有数据库中的所有key
- 
+
 
 3. Redis支持的数据类型
 	
@@ -70,7 +70,7 @@
 	3. set类型
 		* redis的set是string类型的无序集合（这里要区别有序和排序的概念，有序是指插入顺序和取出顺序相同，排序是指集合中的元素按照升序或者降序来排序）
 		* set元素最大可以包含（2的32次方-1）个元素
-		* set集合类型除了最基本的增删操作，其他的游泳操作还包括集合的区并集（union），交集（intersection），差集（difference），通过这些操作可以很容易的实现社交软件中的好友推荐功能。
+		* set集合类型除了最基本的增删操作，其他的有用操作还包括集合的取并集（union），交集（intersection），差集（difference），通过这些操作可以很容易的实现社交软件中的好友推荐功能。
 
 		* set类型操作
 			- sadd key member		添加一个string元素到key对应的set集合中，成功返回1，如果元素已经在集合中则返回0，key对应的set不存在则返回错误。
@@ -98,7 +98,7 @@
 			- zcard key 返回集合中元素个数
 			- zscore key element 返回给定元素对应的score
 			- zremrengebyrank key min max 删除集合中排名在给定区间的元素（权值从小到大排序）
-	 
+	
 	5. 数据类型Hash
 		* hash数据类型存储的数据与mysql数据库中存储的一条记录极为相似。
 
@@ -118,30 +118,31 @@
 
 4. 持久化功能
 
-	1. redis为了内部数据的安全考虑，会把本身的数据以文件的形式保存到硬盘中一份，在服务器重启之后会自动把硬盘中的数据恢复到内存（redis）中
+  1. redis为了内部数据的安全考虑，会把本身的数据以文件的形式保存到硬盘中一份，在服务器重启之后会自动把硬盘中的数据恢复到内存（redis）中
 
-	2. redis本身支持多种持久化功能
-			- snap shotting快照持久化
-				- 该持久化默认开启，一次性把redis中的全部数据保存一份存储到硬盘中，如果数据非常多（10-20G）就不适合频繁进行该持久化操作
-				- 该持久化的持久化文件名为dump.rdb,位于配置文件同目录下
-				- 可以在redis.conf配置文件下设置快照持久化的相关参数
-				- 手动发起快照持久化命令行
-					- > ./redis-cli -h 127.0.0.1 -p 6379 bgsave  
+  2. redis本身支持多种持久化功能
+      - snap shotting快照持久化
+         - 该持久化默认开启，一次性把redis中的全部数据保存一份存储到硬盘中，如果数据非常多（10-20G）就不适合频繁进行该持久化操作
+           - 该持久化的持久化文件名为dump.rdb,位于配置文件同目录下
+           - 可以在redis.conf配置文件下设置快照持久化的相关参数
+           - 手动发起快照持久化命令行
 
-			- append only file（AOF持久化）（精细持久化）
-				- 本质：把用户执行的每个’写‘指令（添加，修改，删除）都备份到文件中，还原数据的时候就是执行具体的写指令而已。
-				- AOF持久化默认是不开启的
-				- 开启AOF持久化（开启AOF持久化的时候会清空redis的内部数据，所以最好是在redis第一次启动的时候就开启AOF而不要在运行中途开启）
-					- 将redis.conf配置文件中的appendonly配置项的no修改为yes
-					- 添加配置项 appendfilename appendonly.aof  用来配置aof持久化文件名称
-					- 持久化文件的生成位置依旧是与redis.conf同级目录
-					- aof备份的备份频率  appendfsync  默认为everysec 
+             - > ./redis-cli -h 127.0.0.1 -p 6379 bgsave  
 
-			- redis的持久化命令
-				- bgsave	一部保存数据到磁盘（快照保存）
-				- lastsave	返回上次成功保存到磁盘的unix时间戳
-				- shutdown	同步保存到服务器并关闭redis服务器
-				- bgrewriteaof	当日志文件过长时优化AOF日志文件的存储
+         - append only file（AOF持久化）（精细持久化）
+         	- 本质：把用户执行的每个’写‘指令（添加，修改，删除）都备份到文件中，还原数据的时候就是执行具体的写指令而已。
+         	- AOF持久化默认是不开启的
+         	- 开启AOF持久化（开启AOF持久化的时候会清空redis的内部数据，所以最好是在redis第一次启动的时候就开启AOF而不要在运行中途开启）
+         		- 将redis.conf配置文件中的appendonly配置项的no修改为yes
+         		- 添加配置项 appendfilename appendonly.aof  用来配置aof持久化文件名称
+         		- 持久化文件的生成位置依旧是与redis.conf同级目录
+         		- aof备份的备份频率  appendfsync  默认为everysec 
+
+         - redis的持久化命令
+         	- bgsave	一部保存数据到磁盘（快照保存）
+         	- lastsave	返回上次成功保存到磁盘的unix时间戳
+         	- shutdown	同步保存到服务器并关闭redis服务器
+         	- bgrewriteaof	当日志文件过长时优化AOF日志文件的存储
 
 5. Redis的主从模式
 
@@ -151,4 +152,4 @@
 		1. 获取主服务器的host和port
 		2. 在从服务器的redis.conf配置文件中查找 slaveof 配置项，配置 slaveof MASTER_HOST MASTER_PORT,重启服务器后就可以连接到主服务器。
 		3. 从服务器时没有写入能力的（写入也没有意义），如果确实需要写入能力，可以将从服务器中的配置项 slave-read-only 设置为no
-				
+			​	
