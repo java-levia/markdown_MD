@@ -7,7 +7,7 @@
 
 	1. 下载redis
 	2. 在/usr/local 文件夹下创建/redis文件夹  将下载下来的redis压缩包ftp到服务器中的/usr/local/redis文件夹下
-	2. 解压压缩包后在解压得到的文件夹中执行make目录进行编译（redis执行的时源码安装）
+	2. 解压压缩包后在解压得到的文件夹中执行make命令进行编译（redis执行的是源码安装）
 	3. 切换到编译完成后的文件夹中，进入src目录，执行make install命令进行安装
 	4. 安装完成后，就可以进入src目录下执行 ./redis-server进行前端启动（但这种方式不能用于生产环境）
 	5. 将 src文件夹下的 redis-server redis-cli 文件复制到redis目录下
@@ -79,9 +79,9 @@
 			- scard key  返回set的元素个数
 			- sismember key member 判断member元素是否在set集合中，如果在返回1
 			- sinter key1 key2 ...keyN   返回所有给定key的交集
-			- sunion key1 key2 ...keyN	 f返回所有给定key的并集
-			- sdiff key1 key2 ...keyN	 返回所有给定key的差集
-			- smembers key		返回key对应set的所有元素
+				 sunion key1 key2 ...keyN	 f返回所有给定key的并集
+				 sdiff key1 key2 ...keyN	 返回所有给定key的差集
+				 smembers key		返回key对应set的所有元素
 
 	4. Sort Set 排序集合类型（注意是排序集合而不是有序集合）
 		* redis的sort set是string类型元素的集合，不同的是每个元素都会关联一个权。通过权值可以有序地获取集合中地元素 
@@ -104,16 +104,16 @@
 
 		* hash类型操作
 			- hset key field value	设置hash field为指定值，如果key不存在则先创建（field 类似于mysql数据库中的字段
-			- hget key field	获取指定的hash field
-			- hmget key field 1 ...fieldN 	获取全部指定的hash field
-			- hmset key field1 value1  ...fieldN valueN		同时设置hash的多个field
-			- hincrby key field integer		将指定的hash field加上给定值
-			- hexists key field 	测试指定field是否存在
-			- hdel key field 	删除指定的hash field
-			- hlen key	返回指定hash的field数量
-			- hkeys key		返回hash的所有field
-			- hvals key		返回hash的所有value
-			- hgetall key 		返回hash的所有field和value
+				 hget key field	获取指定的hash field
+				 hmget key field 1 ...fieldN 	获取全部指定的hash field
+				 hmset key field1 value1  ...fieldN valueN		同时设置hash的多个field
+				 hincrby key field integer		将指定的hash field加上给定值
+				 hexists key field 	测试指定field是否存在
+				 hdel key field 	删除指定的hash field
+				 hlen key	返回指定hash的field数量
+				 hkeys key		返回hash的所有field
+				 hvals key		返回hash的所有value
+				 hgetall key 		返回hash的所有field和value
 
 
 4. 持久化功能
@@ -140,9 +140,9 @@
 
          - redis的持久化命令
          	- bgsave	一部保存数据到磁盘（快照保存）
-         	- lastsave	返回上次成功保存到磁盘的unix时间戳
-         	- shutdown	同步保存到服务器并关闭redis服务器
-         	- bgrewriteaof	当日志文件过长时优化AOF日志文件的存储
+         		 lastsave	返回上次成功保存到磁盘的unix时间戳
+         		 shutdown	同步保存到服务器并关闭redis服务器
+         		 bgrewriteaof	当日志文件过长时优化AOF日志文件的存储
 
 5. Redis的主从模式
 
@@ -153,3 +153,4 @@
 		2. 在从服务器的redis.conf配置文件中查找 slaveof 配置项，配置 slaveof MASTER_HOST MASTER_PORT,重启服务器后就可以连接到主服务器。
 		3. 从服务器时没有写入能力的（写入也没有意义），如果确实需要写入能力，可以将从服务器中的配置项 slave-read-only 设置为no
 			​	
+
