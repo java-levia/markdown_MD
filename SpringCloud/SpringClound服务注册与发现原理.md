@@ -236,7 +236,7 @@
    	
    	//如果不将RestTemplate注册到SpringBoot容器中，在启动该服务的时候会报RestTemplate找不到的错误
    	//使用@Bean的方式住的
-       //使用LoadBalance调用Ribbon负载均衡
+       //使用LoadBalance调用Ribbon负载均衡,在请求时拥有客户端负载均衡的能力
    	@Bean
    	@LoadBalanced
    	RestTemplate restTemplate() {
@@ -247,4 +247,58 @@
    
    ```
 
-   
+8. Eureka集群服务
+
+   1. 注册中心集群
+
+      ```yaml
+      #服务端口号
+      server:
+       port: 8200
+       #配置注册中心的别名
+      spring:
+       application:
+        name: app-levia-server8200
+      #eureka相关配置
+      eureka:
+       instance:
+      #注册中心ip地址
+        hostname: 127.0.0.1
+       client:
+        serviceUrl:
+      #注册中心地址(在集群的时候，defaultZone的port是其他注册中心)
+         defaultZone: http://${eureka.instance.hostname}:8100/eureka
+      #是否需要注册到注册中心如果时单机注册中心，不需要去注册中心检索信息；如果是集群，则需要）
+        register-with-eureka: true
+      #是否需要到注册中心去检索信息（如果时单机注册中心，不需要去注册中心检索信息；如果是集群，则需要）
+        fetch-registry: true         
+      
+      ```
+
+   2. 服务提供者集群
+
+      ```yaml
+      #服务提供者的端口号
+      server:
+       port: 8000
+      # 服务别名  serverid
+      spring:
+       application:
+        name: app-levia-member
+      eureka:
+       client:
+        service-url:
+      #当前会员服务注册到eureka服务（指定注册中心地址,如果由多个注册中心则需要指定多个）
+         defaultZone: http://localhost:8100/eureka,http://localhost:8200/eureka
+      #当前服务是否需要注册到注册中心
+        register-with-eureka: true
+      #需要去注册中心检索信息
+        fetch-registry: true
+      
+      ```
+
+   3. 注意事项：
+
+      1. 注册中心集群启动之后，会发现只有一台注册中心由全部的服务住的信息（这台注册中心被称为主机），其他注册中心（从机）上**只有主机的注册信息**
+      2. 服务在注册中心集群中注册之后，只有一台**主机**会获得所有服务的注册信息，另外的**从机**获得的服务注册信息并不完全，只有当主机宕机之后，服务的注册信息才会从主机转移到从机（这个时间默认是30秒）。
+      3. 如果主机在宕机之后重新启动（主机1），在主机1宕机期间作为主机的主机2和主机1上都会有完整的注册信息
