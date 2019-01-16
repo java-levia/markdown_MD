@@ -46,11 +46,6 @@
       		</dependencies>
       	</dependencyManagement>
       	<dependencies>
-      		<!-- springBoot整合web组件 -->
-      		<dependency>
-      			<groupId>org.springframework.boot</groupId>
-      			<artifactId>spring-boot-starter-web</artifactId>
-      		</dependency>
       		<!-- springboot整合eureka客户端 -->
       		<dependency>
       			<groupId>org.springframework.cloud</groupId>
@@ -201,12 +196,12 @@
    	
    	@GetMapping("/getMember")
    	public String getMember() {
-   		//在这里由两种调用方式 一种是采用服务别名的调用方式，另一种是直接调用
+   		//在这里有两种调用方式 一种是采用服务别名的调用方式，另一种是直接调用
    		//这种直接调用的方式是不合理的，一旦涉及到集群的方式，同时存在多个服务时，这种方式就无法达到负载均衡的目的了
    		//String result = template.getForObject("http://127.0.0.1:8000/getMember", String.class);
    		
    		//使用别名的方式调用
-   		//在配置好别名后重启服务，立即访问该服务会报错，别名所代表的服务找不到，原因是restTemplate使用别名调用需要依赖Ribbon负载均衡器（需要在RestTemplate注册Bean时加上@loadBalanced注解）
+   		//在配置好别名后重启服务，立即访问该服务会报错，别名所代表的服务找不到，原因是restTemplate使用别名调用的时候默认是需要负载均衡的  所以需要使用@loadBalance开启负载均衡 需要依赖Ribbon负载均衡器（需要在RestTemplate注册Bean时加上@loadBalanced注解）
    		String url="http://app-levia-member/getMember";
    		String result = template.getForObject(url, String.class);
    		return result;
@@ -235,8 +230,8 @@
    	}
    	
    	//如果不将RestTemplate注册到SpringBoot容器中，在启动该服务的时候会报RestTemplate找不到的错误
-   	//使用@Bean的方式住的
-       //使用LoadBalance调用Ribbon负载均衡,在请求时拥有客户端负载均衡的能力
+   	//使用@Bean的方式注入的
+       ////在配置好别名后重启服务，立即访问该服务会报错，别名所代表的服务找不到，原因是restTemplate使用别名调用的时候默认是需要负载均衡的  所以需要使用@loadBalance开启负载均衡 需要依赖Ribbon负载均衡器（需要在RestTemplate注册Bean时加上@loadBalanced注解）
    	@Bean
    	@LoadBalanced
    	RestTemplate restTemplate() {
@@ -301,4 +296,46 @@
 
       1. 注册中心集群启动之后，会发现只有一台注册中心由全部的服务住的信息（这台注册中心被称为主机），其他注册中心（从机）上**只有主机的注册信息**
       2. 服务在注册中心集群中注册之后，只有一台**主机**会获得所有服务的注册信息，另外的**从机**获得的服务注册信息并不完全，只有当主机宕机之后，服务的注册信息才会从主机转移到从机（这个时间默认是30秒）。
-      3. 如果主机在宕机之后重新启动（主机1），在主机1宕机期间作为主机的主机2和主机1上都会有完整的注册信息
+      3. 如果主机在宕机之后重新启动（主机1），在主机1宕机期间作为主机的主机2和主机1上都会有完整的注册信息 
+
+9. Eureka自我保护机制
+
+   1. 为了防止在EurekaClient可以正常运行，但是与EurekaServer网络不通的情况下，EurekaServer不会将EurekaClient剔除。具体表现是，在某个服务提供者宕机之后，消费方在一段时间内依然可以在注册中心获取到它的注册信息并访问（访问会报连接失败的错误）。
+
+   2. 自我保护机制原理：
+
+      1. 默认情况下EurekaClient定时（默认5秒）向EurekaServer段发送心跳包，如果EurekaServer在一定时间内没有收到EurekaClient发送的心跳包，在丢失了大量心跳的情况下，EurekaServer会开启自我保护机制，不会立即剔除丢失心跳的服务，但是在过了保护机制的时间之后（默认90秒），会直接将丢失心跳的服务从注册列表中剔除。
+
+   3. 自我保护机制的作用：
+
+      1. 由于服务与服务，服务与注册中心之间都是通过网络通信，有可能出现网络状况不好的情况，这时候服务本身并没有故障，在网络恢复之后依旧可以正常调用，有了这个自我保护机制，就可以防止注册中心将这种能正常运行的服务剔除。
+
+   4. 什么环境下开启自我保护机制
+
+      1. 本地环境建议关闭自我保护机制，保证不可用的服务被及时剔除掉，这样在重新启动服务之后能马上将服务注册到注册中心，而不会和注册中心中自我保护机制下的注册信息发生冲突
+
+         * 开启自我保护机制的配置 在**注册中心**配置文件中--> 
+
+           ```yaml
+           server: 
+           	#表示关闭自我保护 
+            anable-self-preservation: false 
+            	#表示间隔两秒剔除一次
+            enviction-interval-timer-in-ms: 2000
+           ```
+
+         * 在**服务配置文件**中--> 
+
+           ```yaml
+           #心跳检测与续约时间
+           #测试时将值设置小些,保证服务关闭后注册中心能及时踢出
+           instance:
+           	#Eureka客户端向服务端发送心跳的时间间隔,单位为秒
+            lease-renewal-interval-in-seconds: 1 #客户端告诉服务端自己会按照这个规则发送心跳
+            	#Eureka服务端在收到最后一次心跳之后等待的时间上限,单位为秒,超过则剔除
+            lease-expiration-duration-in-seconds: 2 # 客户端告诉服务端按照这个规则剔除丢失心跳的服务  
+           ```
+
+           
+
+      2. 生产环境建议开启自我保护机制
