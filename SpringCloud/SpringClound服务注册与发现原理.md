@@ -339,3 +339,46 @@
            
 
       2. 生产环境建议开启自我保护机制
+
+10. 使用ZooKeeper\ consul作为注册中心搭建微服务
+
+  1. 更换注册中心只需要变动MAVEN配置文件和项目的application.yml配置文件,服务的调用方式依旧没有变化(因为底层都是httpclient)
+
+11. RestTemplate这种调用方式了解就好，做开发时常用的是Feign的调用方式
+
+   1. 添加feign依赖
+
+   2. Feign的书写方式是以SpringMvc接口形式书写
+
+   3. @FeignClient调用服务接口， 属性name就是需要调用的那个服务的别名
+
+   4. 代码
+
+     
+
+```xml
+		<!--依赖-->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>	
+```
+
+```java
+package com.levia.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+//name=服务别名
+@FeignClient(name="app-levia-member")
+public interface ConsumerApiFeign {
+	
+    //接口
+	@RequestMapping(value="/getMember")
+	public String getMember();
+}
+
+//在启动类上加上@EnableEurekaClient开启Feign权限
+```
+
