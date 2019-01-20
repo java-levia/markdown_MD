@@ -294,7 +294,7 @@
 
    3. 注意事项：
 
-      1. 注册中心集群启动之后，会发现只有一台注册中心由全部的服务住的信息（这台注册中心被称为主机），其他注册中心（从机）上**只有主机的注册信息**
+      1. 注册中心集群启动之后，会发现只有一台注册中心有全部的服务注册信息（这台注册中心被称为主机），其他注册中心（从机）上**只有主机的注册信息**
       2. 服务在注册中心集群中注册之后，只有一台**主机**会获得所有服务的注册信息，另外的**从机**获得的服务注册信息并不完全，只有当主机宕机之后，服务的注册信息才会从主机转移到从机（这个时间默认是30秒）。
       3. 如果主机在宕机之后重新启动（主机1），在主机1宕机期间作为主机的主机2和主机1上都会有完整的注册信息 
 
@@ -380,5 +380,26 @@ public interface ConsumerApiFeign {
 }
 
 //在启动类上加上@EnableEurekaClient开启Feign权限
+```
+
+12. 微服务包结构
+    1. 对feign客户端来说，调用只需要接口即可，所以可以将每个服务的feign接口集中管理，如果其他服务需要用到这些接口可以将这个接口包作为依赖导入到服务中就可以直接进行调用。这种集中管理的方式避免了一个服务被多个其他服务调用时重复写feign接口的问题。
+    2. 包结构举例如下：
+
+```java
+//maven知识补充：有实现类的工程创建为jar工程，可能被其他工程所继承的创建为Pom工程，pom里面只写共同的依赖信息。war是需要打成web工程进行访问的。
+//在项目的结构中也是能看出显著区别的，pom工程里面只有pom文件没有代码，另外的都是依赖这个pom工程的子工程的代码，jar里面是各种类的代码（接口也是一种特殊类），可以作为其他工程的依赖。war是最终需要打成war放到容器中运行的
+
+//创建Parent聚合工程的时候，因为这个工程存放的是所有工程共同的依赖，这个工程建为maven Project,因为该工程下有多个子工程，packaging创建为Pom而不是jar
+--SpringCloud2.0.Levia.Parent 
+// 其他的工程作为Parent的子工程，不能再新建为Maven Project，而是应该右键Parent工程，在其下创建maven Module，又因为该工程下还有两个子工程，所以packaging类型还是不能选择为jar，而应该是Pom类型
+--SpringCloud2.0.Levia.Service.Api
+//服务的接口包作为SpringCloud2.0.Levia.Service.Api的子工程，还是右键SpringCloud2.0.Levia.Service.Api工程，创建Maven Module，由于这个工程下面没有子工程，所以packaging可以选择为jar
+---SpringCloud2.0.Levia.Service.Api.provider001
+---SpringCloud2.0.Levia.Service.Api.provider002
+--SpringCloud2.0.Levia.Service.Impl.Provider001
+--SpringCloud2.0.Levia.Service.Impl.Provider002
+
+//涉及到实体类的存放，可以单独建立工程进行存放，也可以放在接口项目里面（因为接口会作为其他工程的依赖，而接口的实现这种项目因为解耦的关系，一般不会作为依赖）
 ```
 
