@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>v-for 循环数组、对象数组、对象，迭代数字</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+</head>
+<body>
+    
+    <div id='app'>
+        <!-- 1. 循环普通数组
+        普通循环直接 v-for="item in list"然后使用插值表达式{{item}}可以获得数组的每个值
+        需要索引值的循环  如下
+        -->
+        <p v-for="(item, i) in list">索引值：{{i}}----实际值：{{item}}</p>
+
+        <!-- 2. 对象数组循环
+            思想其实是一样的 有点类似于angular
+        -->
+        <p v-for="(item, i) in objList">索引值：{{i}}----名字：{{item.name}}---年龄：{{item.age}}</p>
+        <!-- 3. 对象
+            括号中第一个位置是值  第二个位置是键  
+            括号中还可以有第三个位置  表示索引
+        -->
+        <p v-for="(val, key) in user">键：{{key}}---值：{{val}}</p>
+
+        <!-- 4. 迭代数字
+          迭代数字  数字从1开始  
+        -->
+        <p v-for='count in 10'>这是第 {{count}} 次循环</p>
+    </div>
+
+    <script >
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                list:['这是一个数组',1,2,3,4,5,6,7],
+                objList:[{name:'这是一个对象数组', age:10000},{name:'张三', age:23},{name:'李四', age:24}],
+                user:{
+                    id:1,
+                    name:'张三',
+                    age:25
+                }
+            },
+            methods:{
+
+            }
+        })
+    </script>
+</body>
+</html>

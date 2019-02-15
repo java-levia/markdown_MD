@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+    <title>事件修饰符</title>
+    <style>
+        .inner{
+            height: 150px;
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+    <!--
+        1. .stop 阻止冒泡
+        2. .prevent  阻止默认事件
+        3. .capture  添加事件监听器时使用事件捕获模式(捕获机制与冒泡机制相反  先触发外部事件  再触发内部的事件)
+        4. .self     只当事件在该元素本身（比如不是子元素）触发时触发回调
+        5. .once     事件只触发一次
+
+    -->
+    <div id='app'>
+        <!--首先了解冒泡机制  在点击内div内部的按钮时，由于按钮被div所包裹，会先触发内部的
+        事件，然后触发外部的事件  就像冒泡  从内往外冒
+        -->
+        <!-- 
+            <div class='inner' @click='outClick'>
+                <input type="button" value='click me' @click='innerClick'>
+            </div>
+        -->
+
+        <!--使用.stop可以阻止冒泡事件  使用这个修饰符后，会阻止外部事件的触发  点击该按钮只会触发innerClick
+        而不会触发outClick
+            注意 .stop修饰的是内部的事件 可以理解为因为阻止的是内部往外冒的行为
+        -->
+        <!--
+            <div class='inner' @click='outClick'>
+                <input type="button" value='click me' @click.stop='innerClick'>
+            </div>
+        -->
+
+        <!-- 使用.capture起用捕获机制  捕获机制与冒泡机制相反  先触发外部事件  再触发内部的事件
+            注意 .capture修饰的是外部的事件 可以理解为因为执行捕获的是外部事件
+        -->
+        <!--
+            <div class='inner' @click.capture='outClick'>
+                    <input type="button" value='click me' @click='innerClick'>
+            </div>
+        -->
+
+        <!-- .self修饰  表示只有在元素本身进行触发时才会触发回调  也就是说在被.self修饰后不会被冒泡机制所影响
+        -->
+            <div class='inner' @click.self='outClick'>
+                    <input type="button" value='click me' @click='innerClick'>
+            </div>
+        <!-- a标签的默认行为是跳转  以下的代码中，点击这个a标签的文字会跳转到百度首页，使用.prevent
+            可以阻止这种默认的跳转行为 
+        -->
+        <!-- .once修饰表示只触发一次  事件修饰符可串联  且调换位置效果不变-->
+        <!-- 以下的代码中 使用.once修饰后 .prevent的效果也只有一次  也就是说第二次触发时不再有阻止默认行为的效果-->
+        <a href="http://www.baidu.com" @click.prevent.once='linkClick'>跳转到百度</a>
+
+
+    </div>
+    <script>
+        var vm = new Vue({
+            el:'#app',
+            data:{
+
+            },
+            methods:{
+                outClick(){
+                    console.log('外部div被触发了')
+                },
+                innerClick(){
+                    console.log('内部button被触发了')
+                },
+                linkClick(){
+                    console.log('这是触发了链接的点击事件')
+                }
+            }
+        })
+    </script>
+</body>
+</html>

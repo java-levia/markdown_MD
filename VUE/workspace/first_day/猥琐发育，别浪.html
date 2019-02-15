@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文字跑马灯效果</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+</head>
+<body>
+   <div id="app">
+    <input type="button" value="浪起来" @click="lang_start()"/>
+    <input type="button" value="低调" @click='lang_stop()'/>
+    <h1 v-text='msg'></h1>
+   </div>
+    <!--文字跑马灯效果实现
+        => 箭头函数
+        在执行setInterval这个函数时，不能直接对this进行操作，需要使用一个变量缓存this，然后在setInterval中对缓存的
+        这个变量进行操作  也就是 var _this=this 这种写法
+        使用箭头函数之后，不再需要缓存这个this
+        使用箭头函数有两个好处：
+            1. 不绑定 this arguments 
+                # 什么叫不绑定this，我个人的理解为箭头函数的this其实就是在定义的时候就确定好的，
+                以后不管怎么调用这个箭头函数，箭头函数的this始终为定义时的this
+            2. 更加简洁的语法
+
+    -->
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data:{
+                msg:'猥琐发育，别浪~~~！'
+            }, 
+            methods:{
+                lang_start() {
+                    setInterval(
+                        ()=> {
+                            var str_start = this.msg.substring(0,1);
+                            var str_end = this.msg.substring(1);
+                            this.msg=str_end+str_start;
+                        }, 400) 
+                },
+                lang_stop(){
+
+                }
+            }
+        })
+    </script>
+</body>
+</html>

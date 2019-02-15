@@ -16,13 +16,13 @@
 3.Spring环境的热部署
 		* 使用devtoos进行热部署
 		* 在springBoot项目的pom文件中加入如下配置即可支持应用的快速重启
-		* <dependency>
 
-			<groupId>org.springframework.boot</groupId>
-
-			<artifactId>spring-boot-devtools</artifactId>
-
-		  </dependency>
+```xml
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-devtools</artifactId>
+	  </dependency>
+```
 
 4.springBoot整合
 	

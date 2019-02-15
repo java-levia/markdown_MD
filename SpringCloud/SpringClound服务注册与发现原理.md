@@ -6,7 +6,7 @@
 
    1. 在传统的远程调用框架中，管理每个服务与服务之间的依赖关系比较复杂。
       * 在传统的远程调用框架中，如果一个服务需要调用另外一个服务，需要使用HttpClient进行调用，（传统的做法是，在服务器中保存一个服务名称和服务地址的键值对，需要调用时查数据库获取对应服务的服务地址赋值到HTTPClient中，但是这样效率非常低）
-   2. 在服务之间的依赖非常多的情况下，服务URL管理起来非常复杂，在这个时候可以使用服务治理技术，管理每个服务与服务之间的依赖关系，可以实现本地负载均衡、服务发现与注册、容错等。
+   2. 在服务之间的依赖非常多的情况下，服务URL管理起来非常复杂，在这个时候可以使用服务治理技术，管理每个服务与服务之间的依赖关系，可以实现**本地**负载均衡、服务发现与注册、容错等。
 
 3. 服务的注册与发现原理
 
@@ -173,7 +173,7 @@
 
 6. 在SpringCloud中有两种调用服务提供者的方式，一种是由SpringBoot提供的模板RestTemplate，另一种是由SpringCloud提供的Fegin。在eureka中默认整合了负载均衡器ribbon
 
-   1. 其中RestTemplate底层是用的HttpClient，eureka底层也是使用的HttpClient（在依赖中由HttpClient的jar包）
+   1. RestTemplate底层是用的HttpClient，eureka底层也是使用的HttpClient（在依赖中由HttpClient的jar包）
    2. //在配置好别名后重启服务，立即访问该服务会报错，别名所代表的服务找不到，原因是restTemplate使用别名调用需要依赖Ribbon负载均衡器（需要在RestTemplate注册Bean时加上@LoadBalanced注解）
 
 7. 消费者代码

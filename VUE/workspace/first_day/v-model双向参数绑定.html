@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>v-model双向参数绑定</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+</head>
+<body>
+    <div id='app'>
+        <h3>{{msg}}</h3>
+        <!--使用v-model指令可以实现数据地双向绑定  v-bind只能单向绑定数据-->
+        <input type="text" v-model='msg' style='width:50%'>
+    </div>
+    <script>
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                msg:'keep calm and carry on'
+            },
+            methods:{
+
+            }
+
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue中的样式  内联样式style</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+</head>
+<body>
+    <!-- 第一种方式: 内联对象
+        这种方式 在style属性名称带中横线的时候需要用单引号包裹
+        也可以抽成对象放到data中进行引入
+    -->
+    <!--
+        <div id='app'>
+            <h1 :style="{color:'red', 'font-weight':200}">keep calm and carry on</h1>
+        </div>
+    -->
+
+    <!-- 第二种方式：引入多个属性
+        在style中采用数组形式
+    -->
+    <div id='app'>
+            <h1 :style="[styleObj1, styleObj2]">keep calm and carry on</h1>
+        </div>
+    <script>
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                styleObj1:{color:'red', 'font-weight':200},
+                styleObj2:{'font-style':'italic'}
+            },
+            methods:{
+
+            }
+        })
+    </script>
+</body>
+</html>
