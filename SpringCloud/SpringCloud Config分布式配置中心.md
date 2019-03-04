@@ -15,3 +15,30 @@
       * ConfigServer缓存配置文件服务器（临时缓存，读取到内存中）（为什么需要设计ConfigServer缓存：目的是缓存git上的配置文件信息，如果每次都要到git上去拉取配置文件信息，效率太低）
       * ConfigClient读取ConfigServer配置文件信息
 
+4. Apollo配置中心实例
+
+   * 阿波罗配置中心整合非常简单，只需要在应用apollo配置的微服务中引入apollo的jar
+
+     ```xml
+     <!--导入Apollo的包-->
+                 <dependency>
+                     <groupId>com.ctrip.framework.apollo</groupId>
+                     <artifactId>apollo-client</artifactId>
+                     <version>1.1.0</version>
+                 </dependency>
+     ```
+
+   * 然后在配置文件中引入apollo配置中心的相关配置
+
+     ```yaml
+     
+     app:
+     //apollo配置中心配置的应用id
+       id: service-zuul
+     apollo:
+     //apollo客户端的ip地址
+       meta: http://192.168.0.129:8080
+     ```
+
+   * 然后在启动类上加上@EnableApolloConfig注解  就可以获取apollo上的配置了(目前使用的版本只支持properties的配置方式，所以需要配置成 zuul.routes. api-a.path = /api-member/** 这种方式)
+
