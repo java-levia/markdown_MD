@@ -42,3 +42,4 @@
 
    * 然后在启动类上加上@EnableApolloConfig注解  就可以获取apollo上的配置了(目前使用的版本只支持properties的配置方式，所以需要配置成 zuul.routes. api-a.path = /api-member/** 这种方式)
 
+   目前发现的问题：在apollo中更新的配置发布后，在工程中没有及时更新，只有重启工程之后才生效，没达到热发布的效果（缺少配置吗？）

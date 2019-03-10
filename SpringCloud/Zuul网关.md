@@ -108,3 +108,32 @@
 
    
 
+5. Zuul网关集群
+   1. 网关集群的搭建：使用Nginx+Zuul进行搭建
+   2. 网关集群的话，一般至少是一主一备或者采用轮询机制
+   3. 在微服务中，所有服务请求都会统一请求到Zuul网关上
+   4. 在集群的Zuul网关之前，还会有Nginx作为反向代理和负载均衡服务器，从客户端发送过来的请求先统一请求到Nginx上，然后通过Nginx实现反向代理和负载均衡，nginx采用轮询算法将请求转发到各个网关
+
+6. Nginx负载均衡的配置
+
+   ```conf
+   #上游服务器集群  默认轮询机制
+   upstream backServer{
+   	#第一个网关的配置
+       server 127.0.0.1:81;
+       #第二个网关的配置
+       server 127.0.0.1:82；
+   }
+   server{
+       listen 80;
+       #这个域名可以在本地的hosts文件中  将127.0.0.1虚拟到java.levia.com
+       server_name java.levia.com;
+       location/{
+           #指定上有服务器负载均衡服务器
+           proxy_pass http://backServer/;
+           index index.html index.htm;
+       }
+   }
+   ```
+
+   
