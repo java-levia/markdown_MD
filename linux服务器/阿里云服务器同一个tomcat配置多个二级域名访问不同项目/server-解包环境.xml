@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Server port="8007" shutdown="SHUTDOWN">
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
+  <GlobalNamingResources>
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+              pathname="conf/tomcat-users.xml" />
+  </GlobalNamingResources>
+  <Service name="Catalina">
+    <Connector port="80" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" />
+    <Connector port="9009" protocol="AJP/1.3" redirectPort="8443" />
+    <Engine name="Catalina" defaultHost="localhost">
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+
+     <Host name="app.bestcjw.cn"  appBase="/usr/local/sanxin_software/quick_fix/app"  unpackWARs="true" autoDeploy="true">
+	  
+	<!--   <Host name="app.bestcjw.cn"  appBase=""  unpackWARs="true" autoDeploy="true">
+		<Context path="" docBase="/usr/local/sanxin_software/quick_fix/app/sc-app" reloadable="true"/>  -->
+		
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="localhost_access_log" suffix=".txt"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+
+      </Host>
+	  
+	 
+	  
+	 <Host name="admin.bestcjw.cn"  appBase="/usr/local/sanxin_software/quick_fix/admin" unpackWARs="true" autoDeploy="true">
+		
+		<!-- <Host name="admin.bestcjw.cn"  appBase=""  unpackWARs="true" autoDeploy="true">
+		<Context path="" docBase="/usr/local/sanxin_software/quick_fix/admin/sc-admin" reloadable="true"/>  -->
+		
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="localhost_access_log" suffix=".txt"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+
+    </Host>
+	  <!--发布新包解压war包时，把包的绝对值路径添加到appBase选项中，并注释掉Context标签，解压完毕后关闭服务，
+	  删除appbase中的配置，然后解开Context标签的注释，将解压后的应用文件夹路径配置到Context标签下的docBase中，重启服务-->
+	  <Host name="upload.bestcjw.cn"  appBase="/usr/local/sanxin_software/quick_fix/upload"    unpackWARs="true" autoDeploy="true">
+	  
+		<!-- <Host name="upload.bestcjw.cn"  appBase=""    unpackWARs="true" autoDeploy="true">
+		<Context path="" docBase="/usr/local/sanxin_software/quick_fix/upload/sc-upload" reloadable="true"/>  -->
+		
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="localhost_access_log" suffix=".txt"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+
+      </Host> 
+    </Engine>
+  </Service>
+</Server>
