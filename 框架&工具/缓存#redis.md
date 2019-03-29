@@ -105,15 +105,15 @@
 		* hash类型操作
 			- hset key field value	设置hash field为指定值，如果key不存在则先创建（field 类似于mysql数据库中的字段
 				 hget key field	获取指定的hash field
-				 hmget key field 1 ...fieldN 	获取全部指定的hash field
-				 hmset key field1 value1  ...fieldN valueN		同时设置hash的多个field
-				 hincrby key field integer		将指定的hash field加上给定值
-				 hexists key field 	测试指定field是否存在
-				 hdel key field 	删除指定的hash field
-				 hlen key	返回指定hash的field数量
-				 hkeys key		返回hash的所有field
-				 hvals key		返回hash的所有value
-				 hgetall key 		返回hash的所有field和value
+				hmget key field 1 ...fieldN 	获取全部指定的hash field
+				hmset key field1 value1  ...fieldN valueN		同时设置hash的多个field
+				hincrby key field integer		将指定的hash field加上给定值
+				hexists key field 	测试指定field是否存在
+				hdel key field 	删除指定的hash field
+				hlen key	返回指定hash的field数量
+				hkeys key		返回hash的所有field
+				hvals key		返回hash的所有value
+				hgetall key 		返回hash的所有field和value
 
 
 4. 持久化功能
