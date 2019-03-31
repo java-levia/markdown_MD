@@ -5,15 +5,35 @@
 
 1. Redis的安装和配置
 
-	1. 下载redis
-	2. 在/usr/local 文件夹下创建/redis文件夹  将下载下来的redis压缩包ftp到服务器中的/usr/local/redis文件夹下
-	2. 解压压缩包后在解压得到的文件夹中执行make命令进行编译（redis执行的是源码安装）
-	3. 切换到编译完成后的文件夹中，进入src目录，执行make install命令进行安装
-	4. 安装完成后，就可以进入src目录下执行 ./redis-server进行前端启动（但这种方式不能用于生产环境）
-	5. 将 src文件夹下的 redis-server redis-cli 文件复制到redis目录下
-	6. 将redis的配置文件 redis.conf 复制一份到redis目录下，更改配置文件中的 daemonize 后面的no为yes
-	7. 使用 ./redis-server redis.conf 后端启动redis
-	8. 使用 ./redis-cli 启动redis客户端对数据库进行操作
+  1. 下载redis
+
+  2. 在/usr/local 文件夹下创建/redis文件夹  将下载下来的redis压缩包ftp到服务器中的/usr/local/redis文件夹下
+
+  3. 解压压缩包后在解压得到的文件夹中执行make命令进行编译（redis执行的是源码安装）
+
+  4. 切换到编译完成后的文件夹中，进入src目录，执行make install命令进行安装
+
+  5. 安装完成后，就可以进入src目录下执行 ./redis-server进行前端启动（但这种方式不能用于生产环境）
+
+  6. 将 src文件夹下的 redis-server redis-cli 文件复制到redis目录下
+
+  7. 将redis的配置文件 redis.conf 复制一份到redis目录下，更改配置文件中的 daemonize 后面的no为yes
+
+  8. 使用 ./redis-server redis.conf 后端启动redis
+
+  9. 使用 ./redis-cli 启动redis客户端对数据库进行操作
+
+  10. 设置密码  在配置文件中添加  requirepass password 配置行
+
+  11. 有密码的redis重启：先登录客户端，通过客户端关闭redis(无密码的redis关闭直接使用  redis-cli shutdown 进行关闭)
+
+      ```
+      127.0.0.1:6379 > auth password
+      OK
+      127.0.0.1:6379 > SHUTDOWN
+      ```
+
+      
 
 
 2. redis的操作
@@ -105,15 +125,15 @@
 		* hash类型操作
 			- hset key field value	设置hash field为指定值，如果key不存在则先创建（field 类似于mysql数据库中的字段
 				 hget key field	获取指定的hash field
-				 hmget key field 1 ...fieldN 	获取全部指定的hash field
-				 hmset key field1 value1  ...fieldN valueN		同时设置hash的多个field
-				 hincrby key field integer		将指定的hash field加上给定值
-				 hexists key field 	测试指定field是否存在
-				 hdel key field 	删除指定的hash field
-				 hlen key	返回指定hash的field数量
-				 hkeys key		返回hash的所有field
-				 hvals key		返回hash的所有value
-				 hgetall key 		返回hash的所有field和value
+				hmget key field 1 ...fieldN 	获取全部指定的hash field
+				hmset key field1 value1  ...fieldN valueN		同时设置hash的多个field
+				hincrby key field integer		将指定的hash field加上给定值
+				hexists key field 	测试指定field是否存在
+				hdel key field 	删除指定的hash field
+				hlen key	返回指定hash的field数量
+				hkeys key		返回hash的所有field
+				hvals key		返回hash的所有value
+				hgetall key 		返回hash的所有field和value
 
 
 4. 持久化功能
@@ -186,7 +206,11 @@
 
       TIPS: 在多线程环境下，如果有在同一个类的两个方法间有值需要传递，通过类变量的方式是不安全的，会有线程问题，这时候就需要创建一个只有线程内部才能共享的变量，  使用  ThreadLocal local= new ThreadLocal();就可以创建一个线程内的变量（假设有这样一种业务需求，在一个线程中，有一个变量需要被线程的执行流程中的多个方法所使用，但是这个变量又不能作为方法的入参，这样的情况下，就可以考虑创建一个线程内变量），残然后在方法中使用local.set("")进行赋值，使用local.get()取值
 
+<<<<<<< HEAD
 8. Redis远程连接不上，可以通过修改redis.conf配置文件达到开启远程连接的目的
    1. 注释掉 bind 127.0.0.1这一行
    2. 将 protected-mode yes改为protected-mode no
 
+=======
+      
+>>>>>>> e8b98924410c0a0800e7356d31e1887a3734ab11
