@@ -45,5 +45,7 @@ cat /etc/mongod.conf # MongoDB配置文件 可以修改里面的log pid 位置 �
 mongo --host 127.0.0.1:27017  #使用
 
 # Control+C 退出
+
+远程连接不上MongoDB 可以尝试将bindIp设置成 0.0.0.0 （不要注释掉这一行  直接改成0.0.0.0）
 ```
 
