@@ -43,30 +43,144 @@
 
 
 2. ActiveMQ安装
-	1. activeMQ安装很简单，直接在官网下载压缩包，上传到服务器解压缩就可以使用（前提是服务器安装好JDK并配置好环境变量）
-	2. activeMQ的启动  在解压文件下的bin文件夹下有一个名为activemq的文件，执行 ./activemq start 就可以启动activemq
-	3. activeMq中集成了一个运行容器jetty，在访问activeMQ控制台的时候输入的端口号其实是jetty的端口号8161，如果要更改jetty的端口号可以在conf目录下的jetty.xml中进行更改。
-	4. 在进入activemq控制台后需要输入用户名和密码，其实是jetty容器的用户名和密码，在jetty-realm.properties配置文件中已经配置好了两个用户：user/admin,用户名和密码都是这两个，如果需要更改也可以在这里面更改。
-	5. ActiveMQ控制台中导航栏选项的意义
-		- Queue：消息队列中的相关信息
-		- Topic：发布订阅模式中的相关信息
-		- Subscribers 用于发布订阅的一个检查端口
-		- Connections 查看当前的activeMQ有有哪些链接
-		- Network 网络的相关信息
-		- Scheduled 定时任务
-		- Send 可以用于测试消息的发送
-	6. activemq.xml		groups.properties		users.properties    jetty-realm.properties	jetty.xml是比较重要的五个配置文件
+  1. activeMQ安装很简单，直接在官网下载压缩包，上传到服务器解压缩就可以使用（前提是服务器安装好JDK并配置好环境变量）
 
-	7. 消息的确认机制
-		1. 创建会话的时候，必须传递两个参数，分别代表是否支持事务和如何确认消息处理。（这两个参数分别针对的是消息的发送者和接收者，是否支持事务只对发送者有效，消息处理机制只对消息处理者有效）
-			- 参数1 transacted-是否支持事务，数据的类型是boolean，true表示支持，false表示不支持
-			- true 支持事务，第二个参数对producer来说默认无效，建议传递的数据是Session.SESSION_TRANSACTED
-			- false 不支持事务，常用参数，第二个参数必须传递，且必须有效
-				- AUTO_ACKNOWLEDGE -自动确认消息，消息的消费者处理后，自动确认，常用。商业开发不推荐
-				- CLIENT_ACKNOWLEDGE -客户端手动确认。消息的消费者处理后，必须手工确认。（这个确认机制只是等客户端确认消息之后就删除消息，另外的客户端并不能拉取到消息，也就是说还是只能被其中一个消费者所消费，并不能被多次处理，DUPS_OK_ACKNOWLEDGE这种处理机制才能被多次消费） 
-				- DUPS_OK_ACKNOWLEDGE -有副本的客户端手动确认。（这种方式一个消息可以多次处理，可以降低Session消耗，在可以容忍重复消息时使用。（不推荐））
+  2. activeMQ的启动  在解压文件下的bin文件夹下有一个名为activemq的文件，执行 ./activemq start 就可以启动activemq
 
-	8. PTP和PUB/SUB的对比
-	
-		
-		
+  3. activeMq中集成了一个运行容器jetty，在访问activeMQ控制台的时候输入的端口号其实是jetty的端口号8161，如果要更改jetty的端口号可以在conf目录下的jetty.xml中进行更改。
+
+  4. 在进入activemq控制台后需要输入用户名和密码，其实是jetty容器的用户名和密码，在jetty-realm.properties配置文件中已经配置好了两个用户：user/admin,用户名和密码都是这两个，如果需要更改也可以在这里面更改。
+
+  5. ActiveMQ控制台中导航栏选项的意义
+    - Queue：消息队列中的相关信息
+    - Topic：发布订阅模式中的相关信息
+    - Subscribers 用于发布订阅的一个检查端口
+    - Connections 查看当前的activeMQ有有哪些链接
+    - Network 网络的相关信息
+    - Scheduled 定时任务
+    - Send 可以用于测试消息的发送
+
+  6. activemq.xml		groups.properties		users.properties    jetty-realm.properties	jetty.xml是比较重要的五个配置文件
+
+  7. 消息的确认机制
+    1. 创建会话的时候，必须传递两个参数，分别代表是否支持事务和如何确认消息处理。（这两个参数分别针对的是消息的发送者和接收者，是否支持事务只对发送者有效，消息处理机制只对消息处理者有效）
+    	- 参数1 transacted-是否支持事务，数据的类型是boolean，true表示支持，false表示不支持
+    	- true 支持事务，第二个参数对producer来说默认无效，建议传递的数据是Session.SESSION_TRANSACTED
+    	- false 不支持事务，常用参数，第二个参数必须传递，且必须有效
+    		- AUTO_ACKNOWLEDGE -自动确认消息，消息的消费者处理后，自动确认，常用。商业开发不推荐
+    		- CLIENT_ACKNOWLEDGE -客户端手动确认。消息的消费者处理后，必须手工确认。（这个确认机制只是等客户端确认消息之后就删除消息，另外的客户端并不能拉取到消息，也就是说还是只能被其中一个消费者所消费，并不能被多次处理，DUPS_OK_ACKNOWLEDGE这种处理机制才能被多次消费） 
+    		- DUPS_OK_ACKNOWLEDGE -有副本的客户端手动确认。（这种方式一个消息可以多次处理，可以降低Session消耗，在可以容忍重复消息时使用。（不推荐））
+
+  8. PTP和PUB/SUB的对比
+
+  9. RabbitMQ linux安装
+
+     1. 首先安装rabbitmq所需的运行环境（erling语言环境）
+
+        * 下载Erlang：官网下载 官网地址 <http://www.erlang.org/download> 挑选合适的版本 然后 wget，运行命令 wget <http://erlang.org/download/otp_src_19.3.tar.gz>或者直接下载到本地然后上传到服务器
+
+        * 使用yum安装必须安装配件 
+
+          yum install gcc glibc-devel make ncurses-devel openssl-devel autoconf
+          yum install unixODBC unixODBC-devel
+
+        * 开始安装
+
+          tar -zxvf otp_src_19.3.tar.gz
+          cd otp_src_19.3
+          ./configure --prefix=/usr/local/erlang --enable-hipe --enable-threads --enable-smp-support --enable-kernel-poll --without-javac
+
+          进行到这一步的时候可能会遇到一些问题，如下：
+
+          configure: error: No curses library functions found 
+
+          解决：yum -y install ncurses-devel
+
+          ```
+          *********************************************************************
+          **********************  APPLICATIONS DISABLED  **********************
+          *********************************************************************
+          
+          crypto         : No usable OpenSSL found
+          jinterface     : Java compiler disabled by user
+          ssh            : No usable OpenSSL found
+          ssl            : No usable OpenSSL found
+          
+          *********************************************************************
+          *********************************************************************
+          **********************  APPLICATIONS INFORMATION  *******************
+          *********************************************************************
+          
+          wx             : wxWidgets not found, wx will NOT be usable
+          
+          *********************************************************************
+          *********************************************************************
+          **********************  DOCUMENTATION INFORMATION  ******************
+          *********************************************************************
+          
+          documentation  : 
+                           xsltproc is missing.
+                           fop is missing.
+                           The documentation can not be built.
+          
+          *********************************************************************
+          ```
+
+          解决：
+
+          ```
+          OpenSSL 	
+          crypto、ssh、ssl
+          解决 yum install openssl-devel
+          
+          Java compiler 	
+          jinterface	
+          解决 yum install java-devel
+          
+          ODBC library 	
+          odbc	
+          解决 yum install unixODBC-devel
+          
+          C++ compiler	
+          orber
+          解决 yum install gcc-c++
+          
+          ```
+
+        * make && make install
+
+        * ln -s /usr/local/erlang/bin/erl /usr/local/bin/
+
+          如果以上都没出现问题，就可以使用了Erlang了
+
+     2. 安装RabbitMq
+
+        自动安装：sudo yum install rabbitmq-server    如果没有问题，就直接安装了不用设置什么东西
+
+        查看运行状态： service rabbitmq-server status  #centos6 安装的rabbitmq路径 /var/lib/rabbitmq
+
+        安装路径 /var/lib/rabbitmq   
+
+        启动RabbitMQ  service rabbitmq-server start  
+
+        停止  service rabbitmq-server stop
+
+        重启  service rabbitmq-server restart
+
+        yum install 安装的rabbitmq 默认安装在/usr/lib目录下
+
+        安装可视化插件 
+
+        * 在rabbitmq的安装目录下的sbin目录下执行 ./rebbitmq-plugins enable rabbitmq_management可以安装可视化插件
+
+        配置文件
+
+        * rabbitmq的配置文件在/etc/rabbitmq下的rabbitmq.config
+
+        登陆可视化界面
+
+        * 账号 guest 密码guest
+
+        
+
+        
