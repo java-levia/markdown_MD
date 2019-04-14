@@ -110,4 +110,18 @@
 
            
 
-      7. Spring提供了一个接口ImportBeanDefinitionRegistrar,实现这个接口并重写其中registerBeanDefinitions(AnnotationMetadata importingClassMetadata,  BeanDefinitionRegistry registry) 方法，通过这个方法就可以往BeanDefinitionMap中注入BeanDefinition.
+      2. Spring提供了一个接口ImportBeanDefinitionRegistrar,实现这个接口并重写其中registerBeanDefinitions(AnnotationMetadata importingClassMetadata,  BeanDefinitionRegistry registry) 方法，通过这个方法就可以往BeanDefinitionMap中注入BeanDefinition。要获取一个类的BeanDefinition可以通过BeanDefinitionBuilder这个类获取
+
+         ```java
+         public void registerBeanDefinition(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry){
+             //通过BeanDefinitionBuilder 传入一个FactoryBean的实现类可以构建一个BeanDefinition
+             BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(FactoryBean的实现类.class);
+             AbstractBeanDefinition definition = builder.getBeanDefinition();
+             //通过BeanDefinition还可以向对应的Bean中传入所需的对象，以下这行代码就是向Bean中传入了所需的对象
+             definition.getConstructorArgumentValues().addGenericArgumentValue(Bean的名称.class)
+             //将Bean的名称和对应的BeanDefinition对象传入registerBeanDefinition方法中可以注入到BeanDefinition中
+             registry.registerBeanDefinition("BeanName", definition);
+         }
+         ```
+
+         
