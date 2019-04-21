@@ -93,3 +93,29 @@ SpringBoot Api拦截
    使用拦截器的弊端：使用拦截器也有一定的局限性，表现在于在拦截器中无法获取请求的参数，原因可以通过阅读Spring的源码得知。如果我们的需求是不仅仅想获得方法名之类的信息，还想获取请求参数的相关信息，那么使用Inteceptor就无法达到目的了
 
 3. 使用切面
+
+```java
+@Aspect
+@Component
+public class TimeAspect {
+
+    //这个表示环绕通知，excution定义切点，也可以通过@PointCut定义切点
+    @Around("execution(* com.order.service.OrderService.placeOrder(..))")
+    public Object handlerControllerMethod(ProceedingJoinPoint pjp) throws Throwable {
+        //通过这个方法可以获取到参数的数组
+        Object[] args = pjp.getArgs();
+        for (Object arg : args) {
+            System.out.println(arg);
+        }
+        //这里相当于Filter中调用doFilter()方法，通过调用它执行Controller方法
+        Object obj = pjp.proceed();
+        return null;
+    }
+}
+
+//切面的优点在于，他可以拿到请求的参数的值，但是他的劣势也很明显，它拿不到request和response等
+```
+
+
+
+以上三种方式各有特点，各有各的适用场景，没有优劣，在不同的业务场景下都有自己的发挥机会

@@ -121,6 +121,109 @@ SpringSecurity基础
      //完成以上配置后，在目标类中注入 SecurityProperties对象就可以获取自定义的配置
      ```
 
+3. SpringSecurity中通过查找数据库中的用户账户信息进行认证
+
+   * SpringSecurity中通过查找数据库中的用户账户信息进行认证是通过SpringSecurity提供的UserDetailsService接口实现的，实现这个接口并重写其中的loadUserByUsername(String username)方法
+
+   * 在loadUserByUsername这个方法中，会将根据用户在登陆过程中输入的用户名到数据库中查找用户信息并将用户信息封装在UserDetails的一个实现类中，SpringSecurity会通过UserDetail中的用户信息去做校验（校验是SpringSecurity做的，我们只需要提供用户信息）
+
+     ```java 
+     //自定义用户账户进行认证，实现UserDetailsService这个接口
+     //关于Authorities：这个是用户授权的角色，在SpringSecurity中，Authorities是将用户与权限管理起来的桥梁，换句话说，真正拥有权限的是角色，将用户赋予某个角色，这个用户就拥有了这个角色的权限
+     @Component
+     public class MyUserDetailsService implements UserDetailsService{
+         
+         @Overrider
+         public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
+             //这个方法会将权限字符串转换成对应的角色对象，并赋予用户相应的权限
+             ArrayList<Authorities> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList("这里传入一个角色的字符串");
+             //这里返回的User是UserDetails的一个实现类，由SpringSecurity实现的
+             return new User(username, password(数据库中查到的密码), authorities(用户的授权角色))
+         }
+     }
+     ```
+
+   * UserDetails接口是SpringSecurity用户登陆校验中很重要的接口
+
+     ```java
+     public interface UserDetails extends Serializable {
+         //上面的三个抽象方法就是在校验用户的流程中获取User对象信息的三个方法
+         Collection<? extends GrantedAuthority> getAuthorities();
+     
+         String getPassword();
+     
+         String getUsername();
+     
+         //以下这几个方法是用于实现我们自定义的认证逻辑的方法
+         
+         //你的账户没有过期（返回true表示没有过期）
+         boolean isAccountNonExpired();
+     
+         //你的账户是否被锁定了（true表示没有锁定或冻结）
+         boolean isAccountNonLocked();
+     
+         //你的密码是否过期（这个方法用于一些需要定期修改密码的网站，如果过期需要重新设置密码）
+         boolean isCredentialsNonExpired();
+     
+         //这个是用于校验用户是否被删除（用于做假删除，true表示没有被删除）
+         boolean isEnabled();
+     }
+     
+     ```
+
+4. SpringSecurity密码校验
+
+   * 在SpringSecurity中进行密码校验这部分功能的是PasswordEncoder,在SpringSecurity的发展过程中，定义过两个PasswordEncoder，其中一个是在crypto包中的是新版本，另一个是在authentication这个包中的老版本，我们的代码中需要使用的是crypto包中的这个接口
+
+     ```java
+     //密码校验接口
+     public interface PasswordEncoder {
+         //这个方法是用于密码加密的方法
+         String encode(CharSequence var1);
+     
+         //这个方法用于校验数据库中的密码和用户登陆输入的密码是否匹配
+         boolean matches(CharSequence var1, String var2);
+     
+         default boolean upgradeEncoding(String encodedPassword) {
+             return false;
+         }
+     }
+     
+     ```
+
+   * 密码的加密，SpringSecurity中对PasswordEncoder接口有默认实现，但是在使用之前需要将加密（encode）和匹配密码（matches）的实现配置到WebSecurityConfigurerAdapter中
+
+     ```java
+     @Configuration
+     public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
+     
+     	@Bean
+         public PasswordEncoder passwordEncoder(){
+             //这个类是PasswordEncoder的实现类
+             //如果需要自定义密码的加密和校验方式，也可以通过实现PasswordEncoder这个接口然后用同样的注入方式注入进SpringSecurity
+         	return new BcryPasswordEncoder();    
+         }
+         
+         @Override
+         protected void configure(HttpSecurity http) throws Exception {
+             //以下代码定义的是： 使用表单登陆的方式认证，且任何请求都需要身份认证
+             //在这里可以配置表单登陆或者httpBasic的方式认证
+             //http.httpBasic()
+             http.formLogin()
+                 //.loginPage("自定义登陆登陆页面")
+                 //.loginProcessingUrl("登陆请求")  登陆请求的路径
+                 .and()
+                 .authorizeRequests()
+                     //.antMatcher("自定义登陆登陆页面").permitAll()   表示登陆页面不需要认证
+                 .anyRequest()
+                 .authenticated()
+                 .and()
+                 .csrf().disable(); //关闭跨站请求伪造防护
+     
+         }
+     }
+     
+     ```
+
      
 
-3. SpringSecurity整合JWT Token进行认证
