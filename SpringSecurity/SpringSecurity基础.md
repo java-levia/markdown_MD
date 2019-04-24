@@ -53,7 +53,6 @@ SpringSecurity基础
      ```java
      //
      @RestController
-     
      public class BrowserSecurityController{
          //Spring会将请求的源链接地址缓存在这个对象中
          private RequestCache requestCache = new HttpSessionRequestCache();
