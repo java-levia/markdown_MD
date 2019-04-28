@@ -165,7 +165,7 @@
    ```java
    
    @Configuration
-   @En
+   @EnableSocial
    public class SocialConfig extends SocaialConfigurerAdapter{
        
        //注入数据库资源
@@ -250,4 +250,38 @@ public class QQAutoConfig extends SocialAutoConfigAdapter{
 
 ```
 
- 
+8.  在以上配置都完成之后，还有很关键的一步，因为SpringSecurity是通过过滤器链进行权限控制的，所以需要将Social的过滤器添加到过滤器链中
+
+```java
+//在这个配置类中添加一个SpringSocial的Bean
+
+@Configuration
+@EnableSocial
+public class SocialConfig extends SocaialConfigurerAdapter{
+    
+    //注入数据库资源
+    @Autowired
+    private DataSource dataSource;
+    
+    @Overrider
+    public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator){
+        
+        //参数1 dataSource是指用户数据存贮所在的数据库资源
+        //参数2 connectionFactoryLocator 直接用传进来的这个值就可以了，作用是根据条件查找目标ConnectionFactory（Spring中可能存在多个ConnectionFactory 因为有可能要连微信  同时也要连接qq）
+        //参数3 textEncryptor 是一个对插入数据库的数据进行加解密的工具  用于保证安全性的  Encryptors.noOpText()的意思是不做加解密
+        JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText());
+        repository.setTablePrefix("这个设置是用于对数据库表设置前缀，如果数据库表用的表名是 UserConnection 就不需要设置这一项")
+        return repository;
+    }
+    
+    @Bean
+    public SpringSocialConfigurer imoocSocialSecurityConfig(){
+        return new SpringSocialConfigurer();
+    }
+}
+
+//然后还需要配置往过滤器链上添加一个过滤器
+
+//在默认情况下 “/auth”开头的URL会由 SocialAuthenticationFilter这个过滤器来进行拦截，然后通过providerID确定链接的后半段  所以请求“/auth/qq”就会跳转到qq的第三方授权页面
+```
+
