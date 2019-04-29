@@ -33,12 +33,12 @@
          private ObjectMapper objectMapper = new ObjectMapper();
          
          //创建构造函数给父类和本类的属性传值
-         public QQImpl(String accessToken, String openId){
+         public QQImpl(String accessToken, String appId){
              //调用父类的构造函数将accessToken传入到父类属性中
              //在默认的Token策略中，会在发请求的时候将accessToken这个参数放在请求头中，但是在qq互联的规则中需要将accessToken这个参数放在请求参数中，显然默认的行为不符合我们的需求，所以传入TokenStrategy.ACCESS_TOKEN_PARAMETER这个参数的传入，是为了定义符合qq互联携带accessToken参数的要求
              super(accessToken, TokenStrategy.ACCESS_TOKEN_PARAMETER);
              
-             this.openId=openId;
+             this.appId = appId;
              //通过请求qq互联的接口获取openId
              String url = String.format(URL_GET_OPENID, accessToken);
              String result = getRestTemplate().getForObject(url, String.class)
