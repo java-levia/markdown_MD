@@ -148,7 +148,8 @@
    
    public class QQConnectionFactory extends OAuth2ConnectionFactory<QQ>{
        
-       public QQconnectionFactory(String providerId, OAuth2ServiceProvider<QQ> serviceProvider, ApiAdapter<QQ> apiAdapter){
+       //这里是重写了构造函数，因为appId appSecret都是需要从外部传过来的参数，这两个参数是创建serviceProvider和apiAdapter的必要参数
+       public QQconnectionFactory(String providerId,String appId, String appSecret){
            
            //参数1 providerId  资源供应商的唯一标志
            //参数2 serviceProvider 就是之前的步骤创建的ServiceProvider
@@ -235,6 +236,14 @@ public class QQProperties extends SocialProperties{
 
 //设定好自定义参数的相关配置之后，还需要使用配置类将配置的参数注入到Social中
 //@ConditionalOnProperty注解是限制  只有当满足某个条件的配置项有值时 这个配置类才生效
+//在SpringBoot2.0中移除了SocialAutoConfigurerAdapter,直接继承SocialConfigurerAdapter类并重写createConnectionFactory方法就行
+// 后补：做到处理注册逻辑的时候发现的一个bug：登录完成后，数据库没有数据，但是再次登录却不用注册了
+// 就怀疑是否是在内存中存储了。结果果然发现这里父类的内存ConnectionRepository覆盖了SocialConfig中配置的jdbcConnectionRepository
+// 这里需要返回null，否则会返回内存的 ConnectionRepository
+ /*  @Override
+    public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
+        return null;
+*/
 @Configuration
 @ConditionalOnProperty（prefix= "...security.social.qq", name="app-id"）
 public class QQAutoConfig extends SocialAutoConfigAdapter{
