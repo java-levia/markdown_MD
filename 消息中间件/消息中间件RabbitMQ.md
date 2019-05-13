@@ -15,7 +15,22 @@
    * 用户授权
      * rabbitmqctl  set_user_tags  User  Tag   user是用户名  Tag是角色  （角色由  administrator，monitoring，policymaker，management等）
    
-3. 简单的测试队列
+3. 发送的消息对象的序列化
+
+   * 在RabbitTemplate中有一个消息转换器对象，其默认值是一个SimpleMessageConverter,他的序列化方式就是按照JDK的序列化规则进行的，而在我们日常的开发中一般使用JSON格式的字符串做数据传输，所以需要配置自定义的序列化方式
+
+   ```java
+   //MessageConverter有多个实现，其中Jackson2JsonMessageConverter可以将对象序列化成json字符串
+   
+   @Bean
+   public MessageConverter messageConverter(){
+   		return new Jackson2JsonMessageConverter();
+   }
+   ```
+
+   
+
+4. 简单的测试队列
 
    * 简单的测试队列基本上就是一个消息的发送者发送消息到队列中，一个接收者监听队列，有消息的时候就会取出来消费。SpringBoot中简单队列创建如下
 
@@ -64,8 +79,6 @@
    //简单队列的劣势：耦合性高，一个生产者对应一个消费者  ，如果需要多个消费者消费队列中的消息，这时候就不行了。如果生产者的队列名变更了，同时也需要变更消费者的队列名，耦合性高
    ```
 
-4. WorkQueues  工作队列
+5. AmqpAdmin: ActiveMQ系统管理功能组件
 
-   模型是：一个生产者对应多个消费者
-
-   解决的问题：生产者和消费者一一对应可能会导致消息的积压，工作队列就是为了解决这个问题出现的
+   * AmqpAdmin可用于创建和删除Queue Exchange Binding
