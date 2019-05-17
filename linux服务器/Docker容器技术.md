@@ -43,12 +43,17 @@ Docker容器哦技术
           --tail ='all'
      
      4. 查看容器内进程：
+        
         * 使用 docker top 容器名 
+        
      5. 在运行中的容器内启动新进程
+        
         * docker exec -d -i -t 容器名 command arg
+        
      6. 停止守护式容器
         * docker stop 容器名：发送一个stop命令等待容器正常停止
         * docker kill 容器名：强制关闭容器
+        
      7. 设置容器的端口映射
         *  run -P -p
         * -P --publish-all =true|false 默认为false（docker run -P -i -t centos /bin/bash）,使用-P将为容器暴露的所有端口进行映射
@@ -58,3 +63,16 @@ Docker容器哦技术
           * hostPort:containerPort    (docker run -p 8082:80 -i -t centos /bin/bash)
           * ip:containerPort    (docker run -p 0.0.0.0:80 -i -t centos /bin/bash)
           * ip:hostPort:containerPort    (docker run -p 0.0.0.0:8082:80 -i -t centos /bin/bash)
+        
+     8. 遇上宿主机正常联网而容器无法联网的情况的解决办法：
+     
+        * vi /usr/lib/sysctl.d/00-system.conf
+        * 添加 net.ipv4.ip_forward=1
+     
+     9. 查看docker容器的ip地址：docker inspect 容器名
+     
+        * 容器内的程序可以通过宿主机的ip地址进行访问，也可以通过容器本身的ip地址进行访问
+        * 使用docker ps命令查看进程信息时，PORTS的信息0.0.0.0:32770->80/tcp  表示的是将容器的80端口映射到宿主机的32770端口上
+     
+     10. 当我们重启容器后，需要另外再重启容器内的服务，通过 docker exec 进程名  服务名（docker  exec  webServer  nginx）
+
