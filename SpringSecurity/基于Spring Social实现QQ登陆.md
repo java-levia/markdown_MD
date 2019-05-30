@@ -294,3 +294,9 @@ public class SocialConfig extends SocaialConfigurerAdapter{
 //在默认情况下 “/auth”开头的URL会由 SocialAuthenticationFilter这个过滤器来进行拦截，然后通过providerID确定链接的后半段  所以请求“/auth/qq”就会跳转到qq的第三方授权页面
 ```
 
+经过以上处理可以通过扫qq的二维码进行登陆了，但是在登录的过程中可能会遇到三个问题：
+
+1. redirect_url非法：引发这个问题的原因是在qq互联上配置的回调链接和程序内部的回调链接不匹配，导致带着授权码信息的请求无法进行回调，
+2. 在我们进行认证请求的时候对OAuth2Operations接口的实现使用的是social提供给我们的默认实现OAuth2Template，在这个实现中对资源服务器的返回信息是当作Json数据处理的，但是qq平台返回的信息实际上是xml格式的，需要对某些类做重写。添加一个可以处理xml格式的响应数据
+
+3. 在qq互联返回的accessToken信息时，返回的并不是JSON格式的数据，而是一串用&符号隔开的字符串，所以在对accessToken进行处理时，默认实现的处理方式并不能得到正确的accessToken，所以这里也需要我们根据实际的返回情况进行处理
