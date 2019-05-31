@@ -299,4 +299,71 @@ public class SocialConfig extends SocaialConfigurerAdapter{
 1. redirect_url非法：引发这个问题的原因是在qq互联上配置的回调链接和程序内部的回调链接不匹配，导致带着授权码信息的请求无法进行回调，
 2. 在我们进行认证请求的时候对OAuth2Operations接口的实现使用的是social提供给我们的默认实现OAuth2Template，在这个实现中对资源服务器的返回信息是当作Json数据处理的，但是qq平台返回的信息实际上是xml格式的，需要对某些类做重写。添加一个可以处理xml格式的响应数据
 
-3. 在qq互联返回的accessToken信息时，返回的并不是JSON格式的数据，而是一串用&符号隔开的字符串，所以在对accessToken进行处理时，默认实现的处理方式并不能得到正确的accessToken，所以这里也需要我们根据实际的返回情况进行处理
+```java
+//OAuth2Template中的exchangeForAccess方法进行获取AccessToken的处理，内部调用了postForAccessGrant这个方法
+
+	public AccessGrant exchangeForAccess(String authorizationCode, String redirectUri, MultiValueMap<String, String> additionalParameters) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap();
+        if (this.useParametersForClientAuthentication) {
+            params.set("client_id", this.clientId);
+            params.set("client_secret", this.clientSecret);
+        }
+
+        params.set("code", authorizationCode);
+        params.set("redirect_uri", redirectUri);
+        params.set("grant_type", "authorization_code");
+        if (additionalParameters != null) {
+            params.putAll(additionalParameters);
+        }
+
+        return this.postForAccessGrant(this.accessTokenUrl, params);
+    }
+
+
+    protected AccessGrant postForAccessGrant(String accessTokenUrl, MultiValueMap<String, String> parameters) {
+        //这里使用getRestTemplate发送post请求并将返回的数据转成MAP，这里期望获取的是JSON格式的数据，但实际qq平台返回的是【text/html】格式的数据
+        return this.extractAccessGrant((Map)this.getRestTemplate().postForObject(accessTokenUrl, parameters, Map.class, new Object[0]));
+    }
+
+//在上面的方法无法正常处理返回的数据，通过层层异常的抛出，最终异常处理器会将请求跳转到默认的失败路径（/signin） ,因为/sign
+
+
+
+//为了解决以上问题，需要添加一个处理【text/html】格式数据的转换器
+
+public QQOAuth2Template extends OAuth2Template{
+    //OAuth2Template这个类中有一个属性useParametersForClientAuthentication，只有这个属性为true的时候，才会带上client_id/client_secret，所以需要在子类构造函数对这个属性默认为true
+    //此外需要将QQServiceProvider中的OAuth2Template替换为QQOAuth2Template
+    public QQOAuth2Template(String clientId, String clientSecret, String authorizeUrl, String authenticateUrl, String accessTokenUrl){
+        super(clientId, clientSecret, authorizeUrl, authenticateUrl, accessTokenUrl);
+        setUseParametersForClientAuthentication(true);
+    }
+    
+    //重写createRestTemplate方法
+    @Override
+    protected RestTemplate createRestTemplate(){
+        //继承父类的RestTemplate并添加转换【text/html】格式数据的转换器
+        RestTemplate restTemplate = super.createRestTemplate();
+        restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+        return restTempate;
+    }
+    
+    //在qq互联的文档中，可以看到最终返回的AccessToken数据并不是理想的JSON格式的数据，而是用&符号隔开的一个字符串，对accessToken的处理是在OAuth2Template类的postAccessGrant方法中，所以还需要重写这个方法
+    @Override
+     protected AccessGrant postAccessGrant(String accessTokenUrl, MultiValueMap<String, String> parameters) {
+         //在这个类中发送Rest请求获取qq互联返回的字符串数据
+         String responseStr = getRestTemplate().postForObject(accessTokenUrl, parameters, String.class);
+         String[] items = StringUtils.splitByWholeSeparatorPreserveAllTokens(responseStr. "&");
+         
+         String accessToken = StringUtils.substringAfterLast(item[0], "=");
+         Long expiresIn = new Long(StringUtils.substringAfterLast(item[1], "="));
+         String refreshToken = StringUtils.substringAfterLast(item[2], "=");
+        return new AccessGrant(accessToken, null, refreshToken, expiresIn);
+    }
+}
+```
+
+
+
+1. 在qq互联返回的accessToken信息时，返回的并不是JSON格式的数据，而是一串用&符号隔开的字符串，所以在对accessToken进行处理时，默认实现的处理方式并不能得到正确的accessToken，所以这里也需要我们根据实际的返回情况进行处理
+
