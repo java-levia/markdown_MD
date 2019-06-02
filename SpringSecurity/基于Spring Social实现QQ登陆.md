@@ -350,7 +350,7 @@ public QQOAuth2Template extends OAuth2Template{
     
     //在qq互联的文档中，可以看到最终返回的AccessToken数据并不是理想的JSON格式的数据，而是用&符号隔开的一个字符串，对accessToken的处理是在OAuth2Template类的postAccessGrant方法中，所以还需要重写这个方法
     @Override
-     protected AccessGrant postAccessGrant(String accessTokenUrl, MultiValueMap<String, String> parameters) {
+     protected AccessGrant postForAccessGrant(String accessTokenUrl, MultiValueMap<String, String> parameters) {
          //在这个类中发送Rest请求获取qq互联返回的字符串数据
          String responseStr = getRestTemplate().postForObject(accessTokenUrl, parameters, String.class);
          String[] items = StringUtils.splitByWholeSeparatorPreserveAllTokens(responseStr. "&");
@@ -366,4 +366,23 @@ public QQOAuth2Template extends OAuth2Template{
 
 
 1. 在qq互联返回的accessToken信息时，返回的并不是JSON格式的数据，而是一串用&符号隔开的字符串，所以在对accessToken进行处理时，默认实现的处理方式并不能得到正确的accessToken，所以这里也需要我们根据实际的返回情况进行处理
+
+
+
+在通过Social获取qq的用户信息成功后，用户依旧无法登陆，因为在认证逻辑中，如果没有系统用户与qq用户的绑定关系，则Security框架会将页面导向注册页（默认的注册页路径是“/signup”），又因为/signup这个路径没有访问权限，最终用户会被提示请先登录。解决这个问题的方式就是配置一个注册页。
+
+* 根据需要获取的用户信息定义一个注册页面，并创建一个Controller用于处理注册逻辑
+* 告知过滤器在查找不到用户信息的时候将用户导向我们自定义的注册页面（需要在对SpringSocialConfigurer的属性signupUrl进行设置，这个属性在SocialConfig类中）
+
+
+
+在我们自定义的注册页面上，不管是使用已有账号与qq账号信息进行绑定还是新注册账号并绑定qq绕不过去的一点就是我们都得拿到从qq资源服务器获取到的用户信息并将其插入到数据库中。Social提供了一个工具类ProviderSignInUtils用于完成这部分功能。
+
+```java
+//首先需要将ProviderSignInUtils这个类注册到Spring中
+
+public ProviderSignInUtils providerSignInUtils(){
+    return new ProviderSignInUtils();
+}
+```
 
