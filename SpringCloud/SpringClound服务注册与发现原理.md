@@ -379,7 +379,7 @@ public interface ConsumerApiFeign {
 	public String getMember();
 }
 
-//在启动类上加上@EnableEurekaClient开启Feign权限
+//在启动类上加上@EnableFeignClient开启Feign权限
 ```
 
 12. 微服务包结构

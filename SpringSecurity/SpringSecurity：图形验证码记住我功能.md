@@ -117,3 +117,31 @@ SpringSecurity：图形验证码/记住我功能
       ```
 
    2. 在验证码认证失败后，security还是调用了后续的认证（在打印堆栈信息的时候把用户信息也打印出来了），这里的处理方式是直接在处理完认证失败的异常后直接return；就不会再调用下面的过滤器链了
+
+2. Security的记住我功能
+
+   ```java
+   //首先要在登陆页上添加一个Checkbox，name必须是remember-me value是true
+   
+   //注册一个用于操作数据库的TokenRepository  Bean
+   @Bean
+   public PersistentTokenRepository persistentTokenRepository(){
+       JdbcToeknRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl(); 
+       tokenReposirory.setDataSource(dataSource);
+       //这个配置项只在第一次启动的时候使用，不然会报错，是用于创建存储Token的表的
+       //tokenReposirory.setCreateTableStartup(true);
+       
+       
+       return tokenReposirory；
+   }
+   
+   //此外还需要设置Token过期的秒数，这个时间可以做一个自定义配置，还需要配置一个userDetailsService用于获取到用户信息后的登陆，这些信息都用于在MyWebSecurityConfigurerAdapter这个类中做配置时添加上去
+   
+   .and()
+       .rememberMe()
+       .tokenRepository(persistentTokenRepository())  //persistentTokenRepository()方法会返回一个对象
+       .tokenValidateSeconds(这个时间从配置中获取)
+       .userDetailsService(userDetailsService)
+   ```
+
+   
