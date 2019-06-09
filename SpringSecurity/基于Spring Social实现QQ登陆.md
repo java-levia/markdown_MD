@@ -52,6 +52,7 @@
          @Overrider
          public QQUserInfo getUserInfo(){
              //进行获取用户信息的操作
+             //由于父类已经处理了accessToken这个参数，所以在这里不需要带上这个参数
              String url = String.format(URL_GET_USERINFO, appId, openId)
              //发送请求获取用户信息
              String result = getRestTemplate().getForObject(url, String.class)
@@ -62,8 +63,8 @@
              return objectMapper.readvalue(result, QQUserInfo.class);
          }
      }
-     ```
-
+   ```
+     
      
 
 2. 完成以上获取用户信息的步骤后，再使用OAuth2Operations的默认实现类OAuth2Template（这个也可以实现OAuth2Operations接口来自己做实现）就可以生成一个ServiceProvider对象了（通过继承抽象类AbstractOAuth2ServiceProvider）。
@@ -79,7 +80,11 @@
        private static final String URL_ACCESS_TOKEN="https://graph.qq.com/oauth2.0/token";
        //实现抽象类AbstractOAuth2ServiceProvider必须要重写的一个构造函数，目的是向ServiceProvider传递一个OAuth2Operations的实现，在这里使用Social的一个默认实现OAuth2Template
        public QQServiceProvider(String appId, String appSecret){
-           //使用OAuth2Template需要传递四个参数  1.clientId  通过注册qq互联获取到的appId 2.clientSecret  通过注册qq互联获取到的appSecret  3.authorzeUrl 这个链接是指将用户导向认证服务器时需要访问的链接（OAuth2协议认证流程图的步骤1）  4.accessTokenUrl 这个链接是指软件客户端拿着认证信息去认证服务器申请令牌时需要访问的链接（OAuth2协议认证流程图的步骤4）
+           /*使用OAuth2Template需要传递四个参数  
+           1.clientId  通过注册qq互联获取到的appId 
+           2.clientSecret  通过注册qq互联获取到的appSecret  
+           3.authorzeUrl 这个链接是指将用户导向认证服务器时需要访问的链接（OAuth2协议认证流程图的步骤1）  
+           4.accessTokenUrl 这个链接是指软件客户端拿着认证信息去认证服务器申请令牌时需要访问的链接（OAuth2协议认证流程图的步骤4）*/
            super(new OAuth2Template(appId, appSecret, URL_AUTHORIZE, URL_ACCESS_TOKEN))
                
            this.appId = appId;
