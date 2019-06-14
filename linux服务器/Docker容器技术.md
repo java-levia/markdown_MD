@@ -1,4 +1,4 @@
-Docker容器哦技术
+Docker容器技术
 
 1. Docker的基本组成
    * Docker Client客户端
@@ -43,11 +43,11 @@ Docker容器哦技术
           --tail ='all'
      
      4. 查看容器内进程：
-        
+       
         * 使用 docker top 容器名 
         
      5. 在运行中的容器内启动新进程
-        
+       
         * docker exec -d -i -t 容器名 command arg
         
      6. 停止守护式容器
@@ -76,3 +76,9 @@ Docker容器哦技术
      
      10. 当我们重启容器后，需要另外再重启容器内的服务，通过 docker exec 进程名  服务名（docker  exec  webServer  nginx）
 
+
+
+搭建自己的腾讯云服务器环境：
+
+1. pull一个mysql镜像     docker pull mysql
+2. 
