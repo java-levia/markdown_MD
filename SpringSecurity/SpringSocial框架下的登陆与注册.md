@@ -33,3 +33,32 @@ SpringSocial框架下的登陆与注册
    ```
 
    
+
+4. 在Browser安全相关的控制器类中提供一个方法用于获取到用户第三方平台的用户信息。（通过ProviderSignupUtils）
+
+```java
+//因为在之前我们将ProviderSignupUtils当作Bean注入到了SPring中，所以可以使用@autowired进行自动注入到控制器类中
+@getMapping("/social/user")
+public SocialUserInfo getSocialInfo(HttpServletRequest request){
+    SocialUserInfo userInfo = new SocialUserInfo();
+    //这里能从Session中拿到Connection信息是因为在SocialAuthenticationFilter中（250行左右）将Connection信息设置到了Session中
+    Connection<?> connection = providerSignupUtils.getConnectionFromSession(new ServletWebRequest(request));
+    //然后通过Connection获取到相应的用户信息设置到userInfo中
+}
+```
+
+5. 在用户的注册或者绑定逻辑中都是需要用到ProviderSignupUtils这个对象的，因为直到目前为止，用户在第三方平台获取到的信息依旧没有存储到数据库中，所以需要在注册或者绑定逻辑中，将平台的用户唯一标识与获取到的第三方平台用户信息关联并插入到数据库中。
+
+```java
+//
+
+public void regist(User user, HttpServletRequest request){
+    //获取到用户信息中中唯一标识（这里用的是用户名）
+    String userId = user.getUserName();
+    //将用户唯一标识传入到providerSignupUtils中与第三方信息绑定起来并注册到第三方信息表中
+    providerSignupUtils.doPostSignUp(userId, new ServletWebRequest(request));
+}
+```
+
+6. 最后，注册的请求也要配置到Security安全配置中进行放行。
+7. mysql8.0中将rank这个字段设为了关键字，所以在使用springSocial时最好使用mysql8.0以下的数据库
