@@ -62,3 +62,34 @@ public void regist(User user, HttpServletRequest request){
 
 6. 最后，注册的请求也要配置到Security安全配置中进行放行。
 7. mysql8.0中将rank这个字段设为了关键字，所以在使用springSocial时最好使用mysql8.0以下的数据库
+8. 实现Social登陆时，必须重写SocialConfigurerAdapter子类中的getUsersConnectionRepository方法并将数据库注入，否则Social会默认从内存中获取用户信息，导致即便用户使用已注册的账号进行登陆，错误处理器依旧会将页面循环跳转到signup页。
+
+```java
+//
+@Configuration
+public class WeixinAutoConfig extends SocialConfigurerAdapter {
+
+    @Autowired
+    private SecurityProperties securityProperties;
+    @Autowired
+    private DataSource dataSource;
+
+    @Override
+    public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
+        connectionFactoryConfigurer.addConnectionFactory(this.createConnectionFactory());
+    }
+
+    public ConnectionFactory<?> createConnectionFactory() {
+        WeixinProperties weixin = securityProperties.getSocial().getWeixin();
+        return new WeixinConnectionFactory(weixin.getProviderId(),weixin.getAppId(), weixin.getAppSecret());
+    }
+
+    //必须重写这个方法
+    @Override
+    public UsersConnectionRepository getUsersConnectionRepository(
+            ConnectionFactoryLocator connectionFactoryLocator) {
+        return new JdbcUsersConnectionRepository(dataSource,connectionFactoryLocator, Encryptors.noOpText());
+    }
+}
+```
+
