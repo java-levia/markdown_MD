@@ -93,3 +93,35 @@ public class WeixinAutoConfig extends SocialConfigurerAdapter {
 }
 ```
 
+9. 平台账号与第三方平台账号的绑定与解绑
+
+   * 在平台账号与第三方平台的信息进行绑定与解绑的需求下，至少要实现三个功能：
+     1. 平台账号与第三方账号的绑定
+     2. 平台账号与第三方账号的解绑
+     3. 平台账号与第三方账号当前的绑定关系
+
+   * 在SpringSocial 的实现中，已经提供了这三个功能的默认实现，但是在实现的过程中只提供了数据，没有提供视图，所以开发者需要创建一个视图用于将数据展现到页面上
+     * 提供这几个功能的服务是ConnectController这个控制器类，其中“/connect”所映射的控制器可以获取当前登陆账号的绑定关系（connectionStatus方法）。
+
+   ```java
+   @RequestMapping(
+           method = {RequestMethod.GET}
+       )
+       public String connectionStatus(NativeWebRequest request, Model model) {
+           this.setNoCache(request);
+           this.processFlash(request, model);
+           Map<String, List<Connection<?>>> connections = this.connectionRepository.findAllConnections();
+           model.addAttribute("providerIds", this.connectionFactoryLocator.registeredProviderIds());
+           model.addAttribute("connectionMap", connections);
+           //这里返回的是一个字符串“connect/status”，Spring会尝试在程序中查找“connect/status”所对应的视图，所以如果需要对返回的数据进行封装然后创建视图返回给前端，需要写一个控制器（映射路径为“connect/status”）
+           return this.connectView();
+       }
+   //从这个方法可以看到该方法获取到了该用户的所有账号连接信息，根据需求可以获取到我们需要任何已有的用户相关信息。可以只返回是否绑定，也可以返回其他相关信息
+   
+   //写一个方法继承AbstractView这个抽象类写一个视图，通过参数model获取到数据，然后通过respose将数据以流的形式返回到页面
+   
+   ```
+
+    *  尚未绑定的账号进行绑定
+       *  
+
