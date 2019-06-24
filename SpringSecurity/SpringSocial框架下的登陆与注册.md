@@ -119,9 +119,59 @@ public class WeixinAutoConfig extends SocialConfigurerAdapter {
    //从这个方法可以看到该方法获取到了该用户的所有账号连接信息，根据需求可以获取到我们需要任何已有的用户相关信息。可以只返回是否绑定，也可以返回其他相关信息
    
    //写一个方法继承AbstractView这个抽象类写一个视图，通过参数model获取到数据，然后通过respose将数据以流的形式返回到页面
+   /**
+    * 获取绑定关系
+ */
+   @Component("connect/status")
+   public class BindStatusView extends AbstractView {
+       @Autowired
+       private ObjectMapper objectMapper;
+       /**
+        *
+        * @param model 在之前的模型中，通过addAttribute方法将一些数据设置到了这个模型中，所以此时可以通过model的方法将这些数据获取出来
+        * @param request
+        * @param response
+        * @throws Exception
+        */
+       @Override
+       protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+           //connections是获取到的第三方平台上的用户信息
+           Map<String, List<Connection<?>>> connections = (Map<String, List<Connection<?>>>)model.get("connectionMap");
+           Map<String, Boolean> result = new HashMap<>();
+           for (String s : connections.keySet()) {
+               result.put(s, !CollectionUtils.isEmpty(connections.get(s)));
+           }
+           response.setContentType("application/json;charset=UTF-8");
+           response.getWriter().write(objectMapper.writeValueAsString(result));
+       }
+   }
    
    ```
-
+   
     *  尚未绑定的账号进行绑定
-       *  
+       
+       * 第三方账号与平台账号的绑定逻辑，Social也已经帮我们实现了，具体的请求是ConnectController类中的“connect/{providerId}”这个POST请求。我们只需要在页面上发起“connect/{providerId}”的post请求，Social会帮我们将此时登陆的用户引导向绑定providerId对应的第三方平台。需要注意的是，Social同样没有帮我们实现视图，我们需要自己动手实现对应的视图。
+       
+         ```java
+         /**
+          * 这个视图是用于第三方平台账号与平台账号绑定成功后用于展示绑定结果的页面，为了保证这个视图被不同的平台绑定成功时所使用
+          * 所以在这里我们不能像展示绑定状态的那个视图一样在这里使用Component进行写死，而是需要到各第三方平台的配置类中进行自定义
+          */
+         public class BindView extends AbstractView {
+             @Override
+             protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+         
+                 response.setContentType("text/html;UTF-8");
+                 response.getWriter().write("<h3>绑定成功<h3>");
+             }
+         }、
+         
+         @Bean("/connect/weixinConnected")
+             @ConditionalOnMissingBean(name = "weixinConnected")  //这个注解的使用，可以保证使用容器的人通过向Spring中注入一个名为weixinConnected的Bean自定义绑定成功展示
+             public BindView weixinConnected(){
+                 return new BindView();
+             }
+         ```
+       
+         
 
