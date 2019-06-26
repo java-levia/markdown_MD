@@ -2,7 +2,7 @@
 
 1. 毋庸置疑的是，Spring在将Mybatis的Mapper接口实例化的过程中使用了Jdk动态代理。
 
-   1. 先实现Jdk动态代理的InvocationHandle方法，并重写其中的抽象方法invoke，在invoke中实现代理逻辑。
+   1. 先实现Jdk动态代理的InvocationHandle类，并重写其中的抽象方法invoke，在invoke中实现代理逻辑。
 
       ```java
       public xxx implements InvocationHandler(){
