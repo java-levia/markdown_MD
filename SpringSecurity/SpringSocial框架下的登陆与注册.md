@@ -149,7 +149,7 @@ public class WeixinAutoConfig extends SocialConfigurerAdapter {
    ```
    
     *  尚未绑定的账号进行绑定
-       
+      
        * 第三方账号与平台账号的绑定逻辑，Social也已经帮我们实现了，具体的请求是ConnectController类中的“connect/{providerId}”这个POST请求。我们只需要在页面上发起“connect/{providerId}”的post请求，Social会帮我们将此时登陆的用户引导向绑定providerId对应的第三方平台。需要注意的是，Social同样没有帮我们实现视图，我们需要自己动手实现对应的视图。
        
          ```java
@@ -166,7 +166,7 @@ public class WeixinAutoConfig extends SocialConfigurerAdapter {
              }
          }、
          
-         @Bean("/connect/weixinConnected")
+         @Bean("connect/weixinConnected")
              @ConditionalOnMissingBean(name = "weixinConnected")  //这个注解的使用，可以保证使用容器的人通过向Spring中注入一个名为weixinConnected的Bean自定义绑定成功展示
              public BindView weixinConnected(){
                  return new BindView();
@@ -174,4 +174,36 @@ public class WeixinAutoConfig extends SocialConfigurerAdapter {
          ```
        
          
-
+   
+   * 单机session管理
+   
+     * SpringSecurity中的单机session管理很简单，只需要在配置文件中添加一行配置就可以
+   
+       ```properties
+       #这个值不设置默认是30分钟，这里的10表示的是10秒，但是这10秒实际上不会生效，因为SpringSecurity中默认会将小于一分钟的session超时时间重置为1分钟
+       server.session.timeout=10
+       ```
+   
+     * 在SpringSecurity中可以对session超时后的行为做控制，通过在WebSecurityConfigurerAdapter子类的configure方法中添加一行
+   
+       ```java
+       .and()
+           .sessionManagement()
+           .invalidSessionUrl("这里表示session超时后跳转的控制器路径，在控制器中定义session超时后的行文")
+           //session并发控制 ,这里maximumSession设置为1表示系统中同一个账号只允许存在一个session，也就是说同一个时刻只允许一个账号进行登陆，效果就是后面用户登陆会把之前登陆的用户下线
+           .maximumSession(1)
+          //这个配置项可以对踢除用户后的行为做控制，比如对用户 踢出 这种行为做一些记录。新建一个类实现SessionInfomationExpiredStrategy接口并实现onExpiredSessionDetected方法，通过这个方法的参数SessionInfomationExpiredEvent可以获得一些相关的信息，比如说在原登陆页面显示被踢下线的理由
+           .expiredSessionStrategy(new SessionInfomationExpiredStrategy的实现类对象)
+           //如果要在用户登陆之后阻止同账号再登陆，可以再加上以下配置
+           .maxSessionPreventLogin(true)
+       ```
+   
+     * 
+   
+       ```
+       
+       ```
+   
+       
+   
+   * 
