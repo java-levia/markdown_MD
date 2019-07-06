@@ -47,4 +47,87 @@ Token处理(app的认证登陆)
    }
    ```
 
+2. 使用Redis存储Security的登陆令牌
+
+   * Security中默认是将用户的登陆令牌存贮在内存中，这样的存储会有一个问题，一旦服务重启，之前存储在内存中的所有令牌都会消失，所以需要将令牌存储在一个具有持久化能力的容器中
+
+   ```java
+   /**
+    * 认证令牌存储配置类
+    Security中和令牌存储相关的类是TokenStore，通过给TokenStore注入一个Redis连接工厂，可以将Token存储到Redis中
+    */
+   @Configuration
+   public class TokenStoreConfig {
+       @Autowired
+       private RedisTemplate redisTemplate;
    
+       @Bean
+       public TokenStore redisTokenStore(){
+           return new RedisTokenStore(redisTemplate.getConnectionFactory());
+       }
+   }
+   
+   
+   
+   //然后在认证服务器中注入TokenStore
+   
+   @Configuration
+   @EnableAuthorizationServer
+   //通过继承AuthorizationServerConfigurerAdapter类并重写其中的方法可以自定义认证服务器的行为
+   public class MyAuthorizationConfig extends AuthorizationServerConfigurerAdapter {
+       //由于SecuritySocial已经把四种认证模式都实现了
+       // 所以实现认证服务器只需要加上@EnableAuthorizationServer这个注解就可以使用认证服务器
+       @Autowired
+       private AuthenticationManager authenticationManager;
+       @Autowired
+       private UserDetailsService userDetailsService;
+       @Autowired
+       private TokenStore tokenStore;
+   
+       /**
+        * 重写这个方法可以自定义登陆请求入口点的行为
+        * 重写了这个方法后，需要手动指定AuthenticationManager和UserDetails
+        * @param endpoints
+        * @throws Exception
+        */
+       @Override
+       public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+           endpoints.authenticationManager(authenticationManager)
+               	//注入TokenStore
+                   .tokenStore(tokenStore)
+                   .userDetailsService(userDetailsService);
+       }
+   
+   
+       /**
+        * 重写这个方法可以自定义和客户端相关的逻辑，（客户端指的是通过认证服务器访问资源服务器资源的所有角色，简单来说就是会获取令牌的角色）
+        * 重写了这个方法之后，原本配置在文件中的clientId和clientSecret就不再起作用了，而是通过重写的这个方法中的逻辑决定给哪些客户端发放令牌
+        * @param clients
+        * @throws Exception
+        */
+       @Override
+       public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+           //这里Client有两种设置方式，一个是inMemory直接存储在内存中，这种方式适用于只有少量且不怎么变动的客户端访问资源服务的情况，还有一种方式
+           //jdbc，这种方式适用于把部分资源数据开放给其他应用使用的第三方平台。
+           clients.inMemory().withClient("levia_client")
+                   .secret("levia_secret")
+                   //发出的令牌的有效时间
+                   .accessTokenValiditySeconds(7200)
+                   //指定认证模式，加上这行配置后，认证服务器只支持所指定的认证方式，其他三种认证方式无法再使用
+                   .authorizedGrantTypes("refresh_token","password")
+                   //指定发放的权限,这里配置了这个参数后，认证请求就不需要带上scope参数，系统会直接使用这里所配置的scope参数，这里可以配置多个
+                   .scopes("all");
+       }
+   }
+   
+   
+   ```
+
+   
+
+3. Security中使用JWTtoken替换Security的原生Token
+
+   JWT具有自包含、密签、可扩展特性，自包含指的是在JWT中可以包含一部分信息。
+
+   
+
