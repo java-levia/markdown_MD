@@ -246,5 +246,137 @@ Token处理(app的认证登陆)
    
    ```
    
-   往返回的JWTtoken里面添加更多信息
+   往返回的JWTtoken里面添加更多信息,要达到这个目的需要使用TokenEnhancer
+   
+   ```java
+   /**
+    * 创建一个JwtToken增强器
+    */
+   public class MyJwtTokenEnhancer implements TokenEnhancer {
+       @Override
+       public OAuth2AccessToken enhance(OAuth2AccessToken oAuth2AccessToken, OAuth2Authentication oAuth2Authentication) {
+           //在这个方法中可以将一些自定义的信息添加到JWTtoken中
+           Map<String, Object> info = new HashMap<>();
+           info.put("author", "Levia");
+           ((DefaultOAuth2AccessToken)oAuth2AccessToken).setAdditionalInformation(info);
+           return oAuth2AccessToken;
+       }
+   }
+   
+   
+       @Configuration
+       //添加一个静态内部类用于定义JwtTOKEN的配置
+       //下面的这个配置的意思是：检查前缀为 levia.security.oauth2 的配置，如果 storeType = jwt,以下配置生效，matchIfMissing = true 表示如果根本没配置这个参数，以下配置也生效
+       @ConditionalOnProperty(prefix = "levia.security.oauth2", name = "storeType", havingValue = "jwt", matchIfMissing = true)
+       public static class JwtTokenConfig{
+           @Autowired
+           private SecurityProperties securityProperties;
+   
+           //使用JWTtoken需要配置多个Bean
+           @Bean
+           public TokenStore jwtTokenStore(){
+               return new JwtTokenStore(jwtAccessTokenConverter());
+           }
+   
+           //这个Bean用于JwtToken的生成
+           @Bean
+           public JwtAccessTokenConverter jwtAccessTokenConverter(){
+               JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
+               //设置用于Token签名的密钥
+               accessTokenConverter.setSigningKey(securityProperties.getOAuth2AppProperties().getJwtSecretKey());
+               return accessTokenConverter;
+           }
+   
+           /**
+            * 将自己配置的jwtTokenEnhancer作为Bean配置到spring容器中
+            * @return
+            */
+           @Bean
+           @ConditionalOnMissingBean(name = "jwtTokenEnhancer")
+           public TokenEnhancer jwtTokenEnhancer(){
+               return new MyJwtTokenEnhancer();
+           }
+       }
+   }
+   
+   
+   //然后需要到认证服务器中进行注册
+   
+   @Configuration
+   @EnableAuthorizationServer
+   //通过继承AuthorizationServerConfigurerAdapter类并重写其中的方法可以自定义认证服务器的行为
+   public class MyAuthorizationConfig extends AuthorizationServerConfigurerAdapter {
+       //由于SecuritySocial已经把四种认证模式都实现了
+       // 所以实现认证服务器只需要加上@EnableAuthorizationServer这个注解就可以使用认证服务器
+       @Autowired
+       private AuthenticationManager authenticationManager;
+       @Autowired
+       private UserDetailsService userDetailsService;
+       @Autowired
+       private TokenStore tokenStore;
+       @Autowired
+       private SecurityProperties securityProperties;
+       @Autowired(required = false)
+       private JwtAccessTokenConverter jwtAccessTokenConverter;
+       @Autowired(required = false)
+       private TokenEnhancer jwtTokenEnhancer;
+   
+       /**
+        * 重写这个方法可以自定义登陆请求入口点的行为
+        * 重写了这个方法后，需要手动指定AuthenticationManager和UserDetails
+        * @param endpoints
+        * @throws Exception
+        */
+       @Override
+       public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+           endpoints.authenticationManager(authenticationManager)
+                   .tokenStore(tokenStore)
+                   .userDetailsService(userDetailsService);
+   
+           if(jwtAccessTokenConverter!=null && jwtTokenEnhancer!=null){
+               //在这里将jwt增强器设置到增强器链中
+               
+               ///////////////在认证服务器中注册
+               TokenEnhancerChain enhancerChain = new TokenEnhancerChain();
+               List<TokenEnhancer> enhancers = new ArrayList<>();
+               enhancers.add(jwtTokenEnhancer);
+               enhancers.add(jwtAccessTokenConverter);
+               enhancerChain.setTokenEnhancers(enhancers);
+               //这里配置的意思是，如果jwtAccessTokenConverter不为空，则使用jwtAccessTokenConverter作为TokenConverter
+               endpoints.accessTokenConverter(jwtAccessTokenConverter);
+           }
+       }
+   
+   
+       /**
+        * 重写这个方法可以自定义和客户端相关的逻辑，（客户端指的是通过认证服务器访问资源服务器资源的所有角色，简单来说就是会获取令牌的角色）
+        * 重写了这个方法之后，原本配置在文件中的clientId和clientSecret就不再起作用了，而是通过重写的这个方法中的逻辑决定给哪些客户端发放令牌
+        * @param clients
+        * @throws Exception
+        */
+       @Override
+       public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+           //这里Client有两种设置方式，一个是inMemory直接存储在内存中，这种方式适用于只有少量且不怎么变动的客户端访问资源服务的情况，还有一种方式
+           //jdbc，这种方式适用于把部分资源数据开放给其他应用使用的第三方平台。
+           for (int i = 0; i < securityProperties.getOAuth2AppProperties().getJwtSecretKey().length(); i++) {
+               InMemoryClientDetailsServiceBuilder builder = clients.inMemory();
+               if(!ArrayUtils.isEmpty(securityProperties.getOAuth2AppProperties().getClients())){
+                   for (MyOAuth2ClientProperties client : securityProperties.getOAuth2AppProperties().getClients()) {
+                       builder.withClient(client.getClientId())
+                               .secret(client.getClientSecret())
+                               //发出的令牌的有效时间
+                               .accessTokenValiditySeconds(client.getAccessTokenValiditySeconds())
+                               //指定认证模式，加上这行配置后，认证服务器只支持所指定的认证方式，其他三种认证方式无法再使用
+                               .authorizedGrantTypes("refresh_token","password")
+                               //指定发放的权限,这里配置了这个参数后，认证请求就不需要带上scope参数，系统会直接使用这里所配置的scope参数，这里可以配置多个
+                               .scopes("all");
+                   }
+               }
+           }
+   
+       }
+   }
+   ```
+   
+   
 
