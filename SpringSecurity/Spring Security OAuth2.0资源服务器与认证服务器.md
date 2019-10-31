@@ -15,6 +15,7 @@ Spring Security OAuth2.0资源服务器与认证服务器
 
    * 资源服务器：
 
-     1. 
-
+     1. 创建JwtToken配置类，配置jwtTokenStore作为TokenStore，并配置与认证服务器相同的signingKey.
+2. 创建配置类集成ResourceServerConfigurerAdapter并重写configure(HttpSecurity http)用于配置鉴权FilterChain的行为；重写configure(ResourceServerSecurityConfigurer resources)用于定义认证Token的配置，并将步骤1定义的jwtTokenStore配置到其中，并且定义认证失败后的行为（默认跳转到认证服务器的登陆页面）
+     
      ​	

@@ -1,0 +1,38 @@
+{
+  "groups": [
+    {
+      "name": "levia.social",
+      "type": "com.qz.springSocialCore.properties.LeviaSocialProperties",
+      "sourceType": "com.qz.springSocialCore.properties.LeviaSocialProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "levia.social.alipay",
+      "type": "com.qz.springSocialCore.properties.AliProperties",
+      "sourceType": "com.qz.springSocialCore.properties.LeviaSocialProperties"
+    },
+    {
+      "name": "levia.social.filter-process-url",
+      "type": "java.lang.String",
+      "sourceType": "com.qz.springSocialCore.properties.LeviaSocialProperties",
+      "defaultValue": "\/auth"
+    },
+    {
+      "name": "levia.social.public-properties",
+      "type": "com.qz.springSocialCore.properties.SocialPublicProperties",
+      "sourceType": "com.qz.springSocialCore.properties.LeviaSocialProperties"
+    },
+    {
+      "name": "levia.social.qq",
+      "type": "com.qz.springSocialCore.properties.QQProperties",
+      "sourceType": "com.qz.springSocialCore.properties.LeviaSocialProperties"
+    },
+    {
+      "name": "levia.social.weixin",
+      "type": "com.qz.springSocialCore.properties.WeixinProperties",
+      "sourceType": "com.qz.springSocialCore.properties.LeviaSocialProperties"
+    }
+  ],
+  "hints": []
+}
