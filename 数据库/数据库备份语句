@@ -1,0 +1,11 @@
+exp jcxyykt/jcxy_QAZ_234@172.23.4.254/orcl file=/opt/gd_base.dmp log=/home/oracle/gd_base.log full=y
+
+
+
+/opt/dmpexpdp jcxyykt/jcxy_QAZ_234@orcl directory=dmpfile exclude=table:\"IN \'T_LOGGER_INFOS\'\" dumpfile=gd_base.dmp schemas=jcxyykt logfile=gd_base.log
+
+
+create directory dmpfile as '/opt/dmp';
+
+
+expdp user/user@bdc1029 directory=DANGAN_YW exclude=table:in('QL_RES') dumpfile=STATE_20181122.dmp logfile=STATE_1122.log schemas=user

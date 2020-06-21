@@ -6,3 +6,6 @@
 4. 查看所有进程，不显示环境变量  	#ps -A|grep <process_name>  
 5. 启动/停止gitlab  	#gitlab-ctl start/stop
 6. 查看当前的java进程  jps
+7. service NetworkManager stop/start
+8. 00:0c:29:c8:99:90
+

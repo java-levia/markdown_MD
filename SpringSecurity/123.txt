@@ -1,0 +1,9 @@
+OAuth2AuthenticationService
+
+SocialAuthenticationFilter
+
+AuthorizationEndpoint
+
+UsernamePasswordAuthenticationFilter
+
+UsernamePasswordAuthenticationToken
