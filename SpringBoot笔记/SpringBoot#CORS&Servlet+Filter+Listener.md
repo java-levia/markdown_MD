@@ -40,7 +40,7 @@
 		  return map; 
 		 } 
 		}
-
+	
 	细粒度设置
 	@RestController 
 	@RequestMapping(value = "/api", method = RequestMethod.POST) 
@@ -59,8 +59,10 @@
 	在 SpringBootApplication 上使用@ServletComponentScan 注解后，直接通过@WebServlet、
 	@WebFilter、@WebListener 注解自动注册
 	
-	1 public class CustomServlet extends HttpServlet { 
+```java
+1 public class CustomServlet extends HttpServlet { 
 
-	2 public class CustomFilter implements Filter {
+2 public class CustomFilter implements Filter {
 
-	3 public class CustomListener implements ServletContextListener {
+3 public class CustomListener implements ServletContextListener {
+```
